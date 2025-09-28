@@ -1,0 +1,209 @@
+{
+  "name": "N8N Webhook UI – Starter (Trigger/Prompt/Upload/Results)",
+  "nodes": [
+    {
+      "id": "wh_trigger",
+      "name": "Trigger Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 200],
+      "parameters": {
+        "path": "trigger",
+        "httpMethod": "POST",
+        "responseMode": "lastNode"
+      }
+    },
+    {
+      "id": "set_runid",
+      "name": "Set runId",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [520, 200],
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "runId",
+              "value": "={{$json.runId || $json.clientId || $now}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "resp_trigger",
+      "name": "Respond runId",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [760, 200],
+      "parameters": {
+        "responseFormat": "json",
+        "responseBody": "={{ { \"runId\": $json.runId } }}",
+        "responseCode": 200
+      }
+    },
+
+    {
+      "id": "wh_prompt",
+      "name": "Prompt Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 420],
+      "parameters": {
+        "path": "prompt",
+        "httpMethod": "POST",
+        "responseMode": "lastNode"
+      }
+    },
+    {
+      "id": "set_prompt",
+      "name": "Validate Prompt",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [520, 420],
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            { "name": "runId", "value": "={{$json.runId}}" },
+            { "name": "prompt", "value": "={{$json.prompt}}" }
+          ],
+          "boolean": [{ "name": "ok", "value": true }]
+        }
+      }
+    },
+    {
+      "id": "resp_prompt",
+      "name": "Respond ok (prompt)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [760, 420],
+      "parameters": {
+        "responseFormat": "json",
+        "responseBody": "={{ { ok: true, runId: $json.runId, prompt: $json.prompt } }}",
+        "responseCode": 200
+      }
+    },
+
+    {
+      "id": "wh_upload",
+      "name": "Upload Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 640],
+      "parameters": {
+        "path": "upload",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "binaryDataFileName": "files"
+      }
+    },
+    {
+      "id": "set_upload",
+      "name": "Extract Filenames",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [520, 640],
+      "parameters": {
+        "functionCode": "const names = [];\nfor (const item of items) {\n  const bin = item.binary || {};\n  for (const k of Object.keys(bin)) {\n    if (bin[k]?.fileName) names.push(bin[k].fileName);\n  }\n}\nreturn [{ json: { ok: true, runId: $json.runId, files: names }}];"
+      }
+    },
+    {
+      "id": "resp_upload",
+      "name": "Respond ok (upload)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [760, 640],
+      "parameters": {
+        "responseFormat": "json",
+        "responseBody": "={{$json}}",
+        "responseCode": 200
+      }
+    },
+
+    {
+      "id": "wh_results",
+      "name": "Results Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 860],
+      "parameters": {
+        "path": "results",
+        "httpMethod": "GET",
+        "responseMode": "lastNode"
+      }
+    },
+    {
+      "id": "set_results",
+      "name": "Set Placeholder Results",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [520, 860],
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            { "name": "status", "value": "done" },
+            { "name": "message", "value": "Placeholder response from n8n" }
+          ],
+          "json": [
+            {
+              "name": "images",
+              "value": "[\"https://placehold.co/800x600.png\",\"https://placehold.co/800x600.webp\"]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "resp_results",
+      "name": "Respond results",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [760, 860],
+      "parameters": {
+        "responseFormat": "json",
+        "responseBody": "={{$json}}",
+        "responseCode": 200
+      }
+    }
+  ],
+  "connections": {
+    "wh_trigger": {
+      "main": [[{ "node": "set_runid", "type": "main", "index": 0 }]]
+    },
+    "set_runid": {
+      "main": [[{ "node": "resp_trigger", "type": "main", "index": 0 }]]
+    },
+
+    "wh_prompt": {
+      "main": [[{ "node": "set_prompt", "type": "main", "index": 0 }]]
+    },
+    "set_prompt": {
+      "main": [[{ "node": "resp_prompt", "type": "main", "index": 0 }]]
+    },
+
+    "wh_upload": {
+      "main": [[{ "node": "set_upload", "type": "main", "index": 0 }]]
+    },
+    "set_upload": {
+      "main": [[{ "node": "resp_upload", "type": "main", "index": 0 }]]
+    },
+
+    "wh_results": {
+      "main": [[{ "node": "set_results", "type": "main", "index": 0 }]]
+    },
+    "set_results": {
+      "main": [[{ "node": "resp_results", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "version": 2,
+  "settings": {
+    "saveExecutionProgress": false
+  },
+  "staticData": null,
+  "id": "N8N-Webhook-UI-Starter"
+}
