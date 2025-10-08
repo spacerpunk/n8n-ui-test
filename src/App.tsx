@@ -102,10 +102,15 @@ export default function App() {
   const [sendingImages, setSendingImages] = useState(false);
 
   // Finals (binary files from n8n)
-  const [finalStatus, setFinalStatus] = useState<Status>('idle');
+  // const [finalStatus, setFinalStatus] = useState<Status>('idle');
   const [finalImages, setFinalImages] = useState<string[]>([]); // object URLs
-  const [finalMessage, setFinalMessage] = useState('');
+  // const [finalMessage, setFinalMessage] = useState('');
   const [finalArchiveUrl, setFinalArchiveUrl] = useState<string | null>(null); // fallback if zip is returned
+
+  // Finals state
+const [finalStatus, setFinalStatus] = useState<'idle' | 'pending' | 'done' | 'error'>('idle');
+const [finalMessage, setFinalMessage] = useState('');
+const [finalVideos, setFinalVideos] = useState<string[]>([]);  // <-- videos (URLs)
 
   function imgKey(src: string, i: number) {
     return `${src}-${i}`; // unique even with duplicate URLs
@@ -396,122 +401,183 @@ export default function App() {
 
   // (Finals: no polling) — Finals are handled directly from the POST response in sendSelectedImagesBack().
 
-// --- RESULTS: send selected images + feedback back to n8n (Finals via POST; no GET/poll) ---
-  async function sendSelectedImagesBack() {
-    if (!resumeUrl) return;
+// --- RESULTS: send selected images + feedback back to n8n (expects JSON images in POST response; no finals flow) ---
+async function sendSelectedImagesBack() {
+  if (!resumeUrl) return;
 
-    const selections = images
-      .map((src, i) => {
-        const k = imgKey(src, i);
-        if (!selected[k]) return null;
-        return { image: src, feedback: (imgFeedback[k] || '').trim(), index: i };
-      })
-      .filter(Boolean) as Array<{ image: string; feedback: string; index: number }>;
+  const selections = images
+    .map((src, i) => {
+      const k = imgKey(src, i);
+      if (!selected[k]) return null;
+      return { image: src, feedback: (imgFeedback[k] || '').trim(), index: i };
+    })
+    .filter(Boolean) as Array<{ image: string; feedback: string; index: number }>;
 
-    if (selections.length === 0) {
-      setMessage('Select at least one image before sending.');
+  if (selections.length === 0) {
+    setMessage('Select at least one image before sending.');
+    return;
+  }
+
+  setSendingImages(true);
+  setMessage('');
+  setStatus('pending');
+
+  try {
+    const payload = [{ ok: true, resumeUrl, selections }];
+
+    const res = await fetch(toProxied(resumeUrl), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errTxt = await res.text().catch(() => '');
+      setStatus('error');
+      setMessage(`n8n responded ${res.status}. ${errTxt || ''}`.trim());
       return;
     }
 
-    setSendingImages(true);
-    setMessage('');
+    const raw = await res.text();
+    let data: any = raw;
+    try { data = JSON.parse(raw); } catch { /* keep as text if not JSON */ }
 
-    // Show Finals immediately while we wait for THIS POST to finish
-    setActiveTab('finals');
-    setFinalStatus('pending');
-    setFinalMessage('Applying feedback… generating final images…');
+    // Accept array or object
+    const root = Array.isArray(data) ? (data[0] ?? {}) : (data ?? {});
+    if (root?.resumeUrl) setResumeUrl(String(root.resumeUrl));
 
-    try {
-      const payload = [{ ok: true, resumeUrl, selections }];
+    const imgs = normalizeImages(root?.images);
+    const msg = root?.message || '';
+    const st = String(root?.status || '').toLowerCase();
 
-      const res = await fetch(toProxied(resumeUrl), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const errTxt = await res.text().catch(() => '');
-        setFinalStatus('error');
-        setFinalMessage(`n8n responded ${res.status}. ${errTxt || ''}`.trim());
-        return;
-      }
-
-      const ct = (res.headers.get('Content-Type') || '').toLowerCase();
-
-      // JSON (preferred) — allow text/plain too in case n8n sets it
-      if (ct.includes('json') || ct.includes('text/plain')) {
-        const text = await res.text();
-        let data: any = text;
-        try { data = JSON.parse(text); } catch {/* keep as text */}
-        const root = Array.isArray(data) ? (data[0] ?? {}) : (data ?? {});
-        if (root?.resumeUrl) setResumeUrl(String(root.resumeUrl));
-
-        const arrays = [
-          root.finalImages,
-          root.FINAL_IMAGES,
-          root.imagesFinal,
-          root.images_final,
-          root.images, // fallback
-          root.finals,
-          root.FINALS,
-        ].filter(Boolean);
-
-        const flat: string[] = ([] as string[]).concat(
-          ...arrays.map((arr: any) => (Array.isArray(arr) ? arr : [arr]))
-        ).map(String).filter(Boolean);
-
-        if (flat.length === 0) {
-          setFinalStatus('error');
-          setFinalMessage(root?.message || 'No final images found in response (expected finalImages/images).');
-          return;
-        }
-
-        // Accept http(s) and data: URLs directly; binary handled below
-        setFinalImages(flat);
-        setFinalStatus('done');
-        setFinalMessage(root?.message || `Received ${flat.length} final image(s)`);
-        return;
-      }
-
-      // Single image binary
-      if (ct.startsWith('image/')) {
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        setFinalImages([url]);
-        setFinalStatus('done');
-        setFinalMessage('Received 1 final image');
-        return;
-      }
-
-      // ZIP archive
-      if (ct.includes('zip')) {
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        setFinalArchiveUrl(url);
-        setFinalStatus('done');
-        setFinalMessage('Received archive of final images. Download and extract.');
-        return;
-      }
-
-      // Unknown content-type → try blob; if empty, error
-      const blob = await res.blob();
-      if (!blob || blob.size === 0) {
-        setFinalStatus('error');
-        setFinalMessage('Empty response received from n8n');
-        return;
-      }
-      const url = URL.createObjectURL(blob);
-      setFinalImages([url]);
-      setFinalStatus('done');
-      setFinalMessage('Received binary response.');
-    } catch (err: any) {
-      setFinalStatus('error');
-      setFinalMessage(err.message || 'Failed to receive final images');
-    } finally {
-      setSendingImages(false);
+    if (st === 'error') {
+      setStatus('error');
+      setMessage(msg || 'Workflow reported an error.');
+      return;
     }
+
+    if (imgs.length > 0) {
+      setImages(imgs);
+      setStatus('done');
+      if (msg) setMessage(msg);
+      setActiveTab('results'); // stay here
+      return;
+    }
+
+    // Nothing yet—let user hit Refresh
+    setStatus('pending');
+    setMessage(msg || 'Waiting for images from n8n…');
+  } catch (err: any) {
+    setStatus('error');
+    setMessage(err.message || 'Failed to send selected images');
+  } finally {
+    setSendingImages(false);
   }
+}
+
+// --- FINALS: send selected images to n8n and expect JSON with videos ---
+async function sendImagesForFinals() {
+  if (!resumeUrl) return;
+
+  // collect selected images + optional feedback
+  const selections = images
+    .map((src, i) => {
+      const k = imgKey(src, i);
+      if (!selected[k]) return null;
+      return { image: src, feedback: (imgFeedback[k] || '').trim(), index: i };
+    })
+    .filter(Boolean) as Array<{ image: string; feedback: string; index: number }>;
+
+  if (selections.length === 0) {
+    setMessage('Select at least one image before sending.');
+    return;
+  }
+
+  // move to Finals while waiting
+  setActiveTab('finals');
+  setFinalStatus('pending');
+  setFinalMessage('Generating videos from selected images…');
+
+  try {
+    const payload = [{ ok: true, resumeUrl, selections }];
+    // IMPORTANT: resumeUrl should be a /webhook-wait/ URL
+    const res = await fetch(toProxied(resumeUrl), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const raw = await res.text();
+    if (!res.ok) {
+      setFinalStatus('error');
+      setFinalMessage(`n8n responded ${res.status}. ${raw || ''}`.trim());
+      return;
+    }
+
+    // robust parse: JSON array or object, possibly text/plain
+    let data: any = null;
+    try { data = JSON.parse(raw); } catch {
+      const start = Math.min(...['[','{'].map(ch => raw.indexOf(ch)).filter(i => i !== -1));
+      const end = Math.max(raw.lastIndexOf(']'), raw.lastIndexOf('}'));
+      if (start >= 0 && end > start) {
+        try { data = JSON.parse(raw.slice(start, end + 1)); } catch {}
+      }
+    }
+    if (!data) {
+      if (/Workflow was started/i.test(raw)) {
+        setFinalStatus('error');
+        setFinalMessage('Got “Workflow was started”. Ensure POST hits /webhook-wait/ and Webhook uses “Respond to Webhook”.');
+        return;
+      }
+      setFinalStatus('error');
+      setFinalMessage('Could not parse response JSON from n8n.');
+      return;
+    }
+
+    const root = Array.isArray(data) ? (data[0] ?? {}) : data;
+
+    // keep resumeUrl only if it isn't a placeholder
+    const maybeResume = String(root?.resumeUrl || '');
+    if (/^(https?:\/\/|\/)/i.test(maybeResume) && !/\[filled at execution time\]/i.test(maybeResume)) {
+      setResumeUrl(maybeResume);
+    }
+
+    // Accept multiple possible keys / stringified arrays
+    const pickList = (val: any): string[] => {
+      if (Array.isArray(val)) return val.map(String).filter(Boolean);
+      if (typeof val === 'string') {
+        try { const arr = JSON.parse(val); if (Array.isArray(arr)) return arr.map(String).filter(Boolean); } catch {}
+        return val.split(/\s*,\s*/).map(s => s.trim()).filter(Boolean);
+      }
+      return [];
+    };
+
+    const videos =
+      pickList(root.videos) ||
+      pickList(root.VIDEOS) ||
+      pickList(root.media) ||
+      pickList(root.urls) ||
+      [];
+
+    const msg = String(root?.message || '');
+    const st = String(root?.status || '').toLowerCase();
+    const ok = Boolean(root?.ok);
+
+    if ((videos && videos.length > 0) || ok || st === 'done') {
+      setFinalVideos(videos || []);
+      setFinalStatus('done');
+      setFinalMessage(msg || (videos?.length ? `Received ${videos.length} video(s).` : 'Done.'));
+      return;
+    }
+
+    setFinalStatus('pending');
+    setFinalMessage(msg || 'Waiting for videos from n8n…');
+  } catch (err: any) {
+    setFinalStatus('error');
+    setFinalMessage(err?.message || 'Failed to request videos');
+  }
+}
+
 
 function resetAll() {
   setPrompt('');
@@ -591,6 +657,7 @@ function updateDeliverable(idx: number, key: string, value: string) {
                   </Button>
                 </div>
                 <Feedback message={message} />
+                
               </CardContent>
             </Card>
           </TabsContent>
@@ -761,6 +828,19 @@ function updateDeliverable(idx: number, key: string, value: string) {
                       <>Send back images</>
                     )}
                   </Button>
+                  <Button
+                  onClick={sendImagesForFinals}
+                  disabled={!resumeUrl || sendingImages}
+                  aria-busy={sendingImages}
+                >
+                  {sendingImages ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden /> Generating Finals…
+                    </>
+                  ) : (
+                    <>Generate Finals (videos)</>
+                  )}
+                </Button>
                   <TinyBadge label={`status: ${status}`} />
                   <TinyBadge label={`selected: ${Object.values(selected).filter(Boolean).length}`} />
                 </div>
@@ -857,58 +937,48 @@ function updateDeliverable(idx: number, key: string, value: string) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button variant="outline" onClick={resetAll}>New Run</Button>
-                  <TinyBadge label={`status: ${finalStatus}`} />
+              <div className="flex flex-wrap items-center gap-3">
+                <Button variant="outline" onClick={resetAll}>New Run</Button>
+                <TinyBadge label={`status: ${finalStatus}`} />
+              </div>
+                            
+              {finalMessage && <p className="text-sm text-muted-foreground">{finalMessage}</p>}
+                            
+              {finalStatus === 'pending' && (
+                <div className="absolute inset-0 z-10 grid place-items-center rounded-xl bg-white/70">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Generating videos…
+                  </div>
                 </div>
-
-                {finalMessage && (
-                  <p className="text-sm text-muted-foreground">{finalMessage}</p>
-                )}
-
-                {finalArchiveUrl && (
-                  <a
-                    href={finalArchiveUrl}
-                    download="finals.zip"
-                    className="inline-flex items-center gap-2 text-sm underline"
-                  >
-                    <DownloadIcon className="h-4 w-4" /> Download archive
-                  </a>
-                )}
-
-                <AnimatePresence mode="popLayout">
-                  {finalStatus === 'done' && finalImages.length > 0 && (
-                    <motion.div layout className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      {finalImages.map((src, i) => (
-                        <motion.a
-                          key={`${src}-${i}`}
-                          href={src}
-                          target="_blank"
-                          rel="noreferrer"
-                          layout
-                          initial={{ opacity: 0, scale: 0.98 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="group overflow-hidden rounded-2xl border bg-white shadow-sm"
-                        >
-                          <div className="aspect-[4/3] w-full overflow-hidden">
-                            <img src={src} alt={`final-${i + 1}`} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                          </div>
-                          <div className="flex items-center justify-between p-3 text-xs text-muted-foreground">
-                            <span>Final {i + 1}</span>
-                            <span className="inline-flex items-center gap-1">
-                              <LinkIcon className="h-3 w-3" /> Open
-                            </span>
-                          </div>
-                        </motion.a>
-                      ))}
+              )}
+              
+              {finalStatus === 'done' && finalVideos.length > 0 && (
+                <motion.div layout className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {finalVideos.map((src, i) => (
+                    <motion.div
+                      key={`${src}-${i}`}
+                      layout
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="group overflow-hidden rounded-2xl border bg-white shadow-sm"
+                    >
+                      <div className="aspect-video w-full bg-black">
+                        <video src={src} controls preload="metadata" className="h-full w-full" />
+                      </div>
+                      <div className="flex items-center justify-between p-3 text-xs text-muted-foreground">
+                        <span>Video {i + 1}</span>
+                        <a href={src} download className="underline">Download</a>
+                      </div>
                     </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {finalStatus === 'error' && (
-                  <p className="text-sm text-red-600">There was a problem receiving final images.</p>
-                )}
+                  ))}
+                </motion.div>
+              )}
+              
+              {finalStatus === 'error' && (
+                <p className="text-sm text-red-600">There was a problem receiving final videos.</p>
+              )}
+              
               </CardContent>
             </Card>
           </TabsContent>
