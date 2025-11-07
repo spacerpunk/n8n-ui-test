@@ -607,24 +607,24 @@ export default function App() {
       <div className="mx-auto max-w-4xl">
         <header className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">n8n Webhook UI</h1>
-            <p className="text-sm text-slate-400">Flow: Trigger → Style Upload → Compose (files + prompt) → Review Prompts → Results → Finals.</p>
+            <h1 className="text-2xl font-semibold tracking-tight">SlopGenerator</h1>
+            <p className="text-sm text-slate-400">Start → Style Images → User Prompt + Toolkit → Prompt QA → Image Edit → Slop.</p>
           </div>
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-6 bg-slate-800">
-            <TabsTrigger className="data-[state=active]:bg-slate-700" value="trigger">Trigger</TabsTrigger>
-            <TabsTrigger className="data-[state=active]:bg-slate-700" value="uploadStyle" disabled={!resumeUrl}>Style Upload</TabsTrigger>
-            <TabsTrigger className="data-[state=active]:bg-slate-700" value="compose" disabled={!resumeUrl}>Compose</TabsTrigger>
-            <TabsTrigger className="data-[state=active]:bg-slate-700" value="review" disabled={!resumeUrl}>Review</TabsTrigger>
-            <TabsTrigger className="data-[state=active]:bg-slate-700" value="results" disabled={!resumeUrl}>Results</TabsTrigger>
-            <TabsTrigger className="data-[state=active]:bg-slate-700" value="finals" disabled={!resumeUrl}>Finals</TabsTrigger>
+            <TabsTrigger className="data-[state=active]:bg-slate-700" value="trigger">Start</TabsTrigger>
+            <TabsTrigger className="data-[state=active]:bg-slate-700" value="uploadStyle" disabled={!resumeUrl}>Style Images</TabsTrigger>
+            <TabsTrigger className="data-[state=active]:bg-slate-700" value="compose" disabled={!resumeUrl}>Prompt!</TabsTrigger>
+            <TabsTrigger className="data-[state=active]:bg-slate-700" value="review" disabled={!resumeUrl}>Prompt QA</TabsTrigger>
+            <TabsTrigger className="data-[state=active]:bg-slate-700" value="results" disabled={!resumeUrl}>Images</TabsTrigger>
+            <TabsTrigger className="data-[state=active]:bg-slate-700" value="finals" disabled={!resumeUrl}>SL0P</TabsTrigger>
           </TabsList>
 
           {/* TRIGGER */}
           <TabsContent value="trigger">
-            <Card className="mt-4 shadow-sm relative border-slate-700 bg-slate-900">
+            <Card className="mt-4 shadow-sm relative border-slate-700 bg-slate-900 text-gray-300">
               {isTriggering && <LoadingOverlay label="Triggering…" />}
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -653,12 +653,12 @@ export default function App() {
             <Card className="mt-4 shadow-sm relative border-slate-700 bg-slate-900">
               {isUploadingStyle && <LoadingOverlay label="Uploading style images…" />}
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-gray-300">
                   <ImageIcon className="h-5 w-5" /> Style Image Upload
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid gap-2">
+                <div className="grid gap-2 text-gray-300">
                   <Label>Style images</Label>
                   <Input type="file" multiple accept=".png,.jpg,.jpeg,.webp" onChange={onPickStyle} className="bg-slate-800 border-slate-700 text-slate-100 file:text-slate-300" />
                   {!!filesStyle.length && (
@@ -669,7 +669,7 @@ export default function App() {
                     </ul>
                   )}
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 text-gray-300">
                   <Button onClick={submitUploadStyle} disabled={isUploadingStyle || filesStyle.length === 0}>
                     {isUploadingStyle ? (
                       <>
@@ -687,7 +687,7 @@ export default function App() {
 
           {/* COMPOSE */}
           <TabsContent value="compose">
-            <Card className="mt-4 shadow-sm relative border-slate-700 bg-slate-900">
+            <Card className="mt-4 shadow-sm relative border-slate-700 bg-slate-900 text-gray-300">
               {isComposing && <LoadingOverlay label="Sending files + prompt…" />}
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -699,7 +699,7 @@ export default function App() {
                   <Label>Files</Label>
                   <Input type="file" multiple accept=".pdf,.txt,.doc,.docx,.png,.jpg,.jpeg,.webp,.json,.csv" onChange={onPickDocs} className="bg-slate-800 border-slate-700 text-slate-100 file:text-slate-300" />
                   {!!filesDocs.length && (
-                    <ul className="list-disc pl-4 text-xs text-slate-400">
+                    <ul className="list-disc pl-4 text-xs text-slate-400 text-gray-300">
                       {filesDocs.map((f) => (
                         <li key={f.name}>{f.name} – {Math.round(f.size / 1024)} KB</li>
                       ))}
@@ -728,41 +728,41 @@ export default function App() {
 
           {/* REVIEW — only Scene Description per deliverable */}
           <TabsContent value="review">
-            <Card className="mt-4 shadow-sm relative border-slate-700 bg-slate-900">
+            <Card className="mt-4 shadow-sm relative border-slate-700 bg-slate-900 text-gray-300">
               {isSubmittingReview && <LoadingOverlay label="Loading prompts…" />}
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-gray-300">
                   <CheckCircle2 className="h-5 w-5" /> Review Prompts (Scene Descriptions)
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <Button variant="secondary" onClick={fetchReview} disabled={!resumeUrl || isSubmittingReview}>
+                  {/* <Button variant="secondary" onClick={fetchReview} disabled={!resumeUrl || isSubmittingReview}>
                     Refresh from n8n
-                  </Button>
+                  </Button> */}
                   <TinyBadge label={`items: ${deliverables.length}`} />
                 </div>
 
                 {deliverables.length === 0 && (
-                  <p className="text-sm text-slate-400">No prompts loaded yet. Click “Refresh from n8n”.</p>
+                  <p className="text-sm text-slate-400 text-gray-300">No prompts loaded yet. Click “Refresh from n8n”.</p>
                 )}
 
                 <div className="space-y-4">
                   {deliverables.map((d, idx) => {
                     const desc = getSceneDescription(d);
                     return (
-                      <div key={idx} className="rounded-2xl border border-slate-700 bg-slate-900 p-4 shadow-sm">
+                      <div key={idx} className="rounded-2xl border border-slate-700 bg-slate-900 p-4 shadow-sm text-gray-300">
                         <div className="mb-3 flex items-center justify-between">
-                          <span className="text-xs uppercase text-slate-400">Deliverable #{idx + 1}</span>
+                          <span className="text-xs uppercase text-slate-400 text-gray-300">Deliverable #{idx + 1}</span>
                           <TinyBadge label={`#${idx + 1}`} />
                         </div>
                         <div className="grid gap-2">
-                          <Label className="text-slate-300">Scene Description</Label>
+                          <Label className="text-slate-300 text-gray-300">Scene Description</Label>
                           <Textarea
                             readOnly
                             rows={6}
                             value={desc || '—'}
-                            className="bg-slate-800 border-slate-700 text-slate-100"
+                            className="bg-slate-800 border-slate-700 text-slate-100 text-gray-300"
                           />
                         </div>
                       </div>
@@ -770,11 +770,11 @@ export default function App() {
                   })}
                 </div>
 
-                <div className="flex items-center gap-3 pt-2">
+                <div className="flex items-center gap-3 pt-2 text-gray-300">
                   <Button onClick={sendBackToN8n} disabled={!resumeUrl || deliverables.length === 0 || isSubmittingReview}>
                     Send Back to n8n
                   </Button>
-                  <Button variant="outline" onClick={resetAll}>New Run</Button>
+                  {/*<Button variant="outline" onClick={resetAll}>New Run</Button>*/}
                 </div>
 
                 <Feedback message={message} />
@@ -784,18 +784,18 @@ export default function App() {
 
           {/* RESULTS */}
           <TabsContent value="results">
-            <Card className="mt-4 shadow-sm relative border-slate-700 bg-slate-900">
+            <Card className="mt-4 shadow-sm relative border-slate-700 bg-slate-900 text-gray-300">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ImageIcon className="h-5 w-5" /> Results
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button onClick={fetchResults} variant="secondary" disabled={!resumeUrl || status === 'pending'}>
+                <div className="flex flex-wrap items-center gap-3 text-gray-300">
+                  {/* <Button onClick={fetchResults} variant="secondary" disabled={!resumeUrl || status === 'pending'}>
                     <RefreshCw className="mr-2 h-4 w-4" /> Refresh
-                  </Button>
-                  <Button variant="outline" onClick={resetAll}>New Run</Button>
+                  </Button> */}
+                  {/* <Button variant="outline" onClick={resetAll}>New Run</Button> */}
                   <Button onClick={sendSelectedImagesBack} disabled={!resumeUrl || sendingImages}>
                     {sendingImages ? (
                       <>
@@ -822,7 +822,7 @@ export default function App() {
                   <TinyBadge label={`selected: ${Object.values(selected).filter(Boolean).length}`} />
                 </div>
 
-                {message && <p className="text-sm text-slate-400">{message}</p>}
+                {message && <p className="text-sm text-slate-400 text-gray-300">{message}</p>}
 
                 <AnimatePresence mode="popLayout">
                   {status === 'done' && images.length > 0 && (
@@ -836,7 +836,7 @@ export default function App() {
                             initial={{ opacity: 0, scale: 0.98 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0 }}
-                            className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 shadow-sm"
+                            className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 shadow-sm text-gray-300"
                           >
                             <a
                               href={src}
@@ -844,19 +844,19 @@ export default function App() {
                               rel="noreferrer"
                               className="group block"
                             >
-                              <div className="aspect-[4/3] w-full overflow-hidden bg-slate-800">
+                              <div className="aspect-[4/3] w-full overflow-hidden bg-slate-800 text-gray-300">
                                 <img src={src} alt={`result-${i + 1}`} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
                               </div>
                             </a>
-                            <div className="flex items-center justify-between p-3 text-xs text-slate-400">
+                            <div className="flex items-center justify-between p-3 text-xs text-slate-400 text-gray-300">
                               <span>Image {i + 1}</span>
-                              <span className="inline-flex items-center gap-1">
+                              <span className="inline-flex items-center gap-1 text-gray-300">
                                 <LinkIcon className="h-3 w-3" /> Open
                               </span>
                             </div>
 
                             {/* Selection + feedback controls */}
-                            <div className="border-t border-slate-700 p-3 space-y-3">
+                            <div className="border-t border-slate-700 p-3 space-y-3 text-gray-300">
                               <label className="flex items-center gap-2 text-sm" htmlFor={k}>
                                 <input
                                   id={k}
@@ -879,7 +879,7 @@ export default function App() {
                                   onChange={(e) =>
                                     setImgFeedback((prev) => ({ ...prev, [k]: e.target.value }))
                                   }
-                                  className="bg-slate-800 border-slate-700 text-slate-100 placeholder:text-slate-400"
+                                  className="bg-slate-800 border-slate-700 text-slate-100 placeholder:text-slate-400 text-gray-300"
                                 />
                               </div>
                             </div>
@@ -891,17 +891,17 @@ export default function App() {
                 </AnimatePresence>
 
                 {status === 'pending' && (
-                  <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <div className="flex items-center gap-2 text-sm text-slate-400 text-gray-300">
                     <Loader2 className="h-4 w-4 animate-spin" /> Waiting for images from n8n…
                   </div>
                 )}
 
                 {status === 'done' && images.length === 0 && (
-                  <p className="text-sm text-slate-400">No images returned for this run.</p>
+                  <p className="text-sm text-slate-400 text-gray-300">No images returned for this run.</p>
                 )}
 
                 {status === 'error' && (
-                  <p className="text-sm text-red-400">There was a problem fetching results.</p>
+                  <p className="text-sm text-red-400 text-gray-300">There was a problem fetching results.</p>
                 )}
               </CardContent>
             </Card>
@@ -909,16 +909,16 @@ export default function App() {
 
           {/* FINALS */}
           <TabsContent value="finals">
-            <Card className="mt-4 shadow-sm relative border-slate-700 bg-slate-900">
+            <Card className="mt-4 shadow-sm relative border-slate-700 bg-slate-900 text-gray-300">
               {finalStatus === 'pending' && <LoadingOverlay label="Processing feedback…" />}
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ImageIcon className="h-5 w-5" /> Final Videos
+                <CardTitle className="flex items-center gap-2 text-gray-300">
+                  <ImageIcon className="h-5 w-5" /> SL0P
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button variant="outline" onClick={resetAll}>New Run</Button>
+                <div className="flex flex-wrap items-center gap-3 text-gray-800">
+                  {/* <Button variant="outline" onClick={resetAll}>New Run</Button> */}
                   <TinyBadge label={`status: ${finalStatus}`} />
                 </div>
 
