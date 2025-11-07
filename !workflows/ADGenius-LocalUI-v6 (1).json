@@ -1,0 +1,5412 @@
+{
+  "name": "ADGenius-LocalUI-v6",
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "body[0].DELIVERABLES",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1392,
+        768
+      ],
+      "id": "06dd0a17-f97b-453c-ae89-d08ff43b7a0e",
+      "name": "Split Out",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -928,
+        1152
+      ],
+      "id": "61281a04-4d35-4d91-96be-97edac40c780",
+      "name": "Google Gemini Chat Model8",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create a prompt for image generation for {{ $json[\"Scene description\"] }} \n\nDO NOT INCLUDE \"\" on the Prompt\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a Prompt Engineer creating detailed prompts to use in Image Generation\n\nFor each deliverable, generate a structured Imagen prompt explicitly based on the provided input JSON creative direction.\n\nOutput Structure:\nOnly output the Prompt, without extra information or \\n backslash terms.\n\nPhotography Prompts:\nExplicitly include camera proximity, position, lighting, settings, lens types, film type, and image quality modifiers based on Technical Specifications and Creative Elements.\nIllustration and Art Prompts:\nClearly state exact artistic techniques or historical art styles as described in input.\nText Generation in Images:\nExplicitly include concise text phrases, font style, placement, and size based on Creative Elements and Technical Specifications.\nPrompt Parameterization:\nIf parameters are provided, explicitly structure placeholders in prompts clearly as {placeholder\\_name}.\nEnsure each prompt clearly reflects input details verbatim and explicitly. Encourage iterative refinement for optimal Imagen outputs.\nCreate Imagen prompts for each deliverable listed, ensuring adherence to these guidelines:\nMaximum prompt length: 480 tokens.\nEach prompt must explicitly include:\nSubject: Clearly define the main focus (object, person, animal, scenery).\nContext and Background: Clearly specify the setting or scenario around the subject.\nStyle: Clearly state the visual style (e.g., photo, sketch, digital art, charcoal drawing).\nPrompt Writing Process:\n Begin with a concise prompt containing the core idea. Iteratively refine by progressively adding specific details and modifiers to achieve desired imagery.\nCamera proximity: close-up, zoomed out.\nCamera position: aerial, from below.\nLighting: natural, dramatic, warm, cold.\nCamera settings: motion blur, soft focus, bokeh, portrait.\nLens type: 35mm, 50mm, fisheye, wide-angle, macro.\nFilm type: black and white, polaroid.\nShapes and Materials:\n Prompts clearly state subjects combined with unusual materials or shapes (e.g., \"a duffle bag made of cheese\", \"neon tubes in the shape of a bird\").\nText Generation in Images:\n Clearly instruct Imagen to generate text by including concise phrases (max 25 characters each), specifying placement and general font style and size.\nPrompt Parameterization:\nUse structured placeholders to define variables for automated prompt generation:\nExample format: \"A {logo_style} logo for a {company_area} company on a solid color background. Include the text {company_name}.\"\nPhotorealistic Prompts:\n Include specific camera and photographic modifiers:\nPortrait: 24-35mm, black and white film, film noir, depth of field, duotone.\nStill life: Macro lens, 60-105mm, high detail, controlled lighting.\nMotion: Telephoto zoom, 100-400mm, fast shutter speed, movement tracking.\nLandscape/Astronomy: Wide-angle lens, 10-24mm, sharp focus, long exposure.\nFinal Prompt Check:\nEnsure prompts are descriptive, structured, and precisely tuned for optimal Imagen output, based on requests and input.\nAvoid Image quality modifiers: high-quality, beautiful, 4K, HDR, professional studio photo.\n\n**IMPORTANT**\nDO NOT OUTPUT A JSON, ONLY A PROMPT\nAVOID SPECIFIC CAR BRANDS LOGOS\nDO NOT USE CAR BRANDS IN THE PROMPTS\nLESS THAN 1000 CHARACTERS\nAVOID SNOW, WINTER and COLD\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -928,
+        928
+      ],
+      "id": "121b678b-32b4-412b-bc39-95bb5d5a7e79",
+      "name": "Prompt Engineer Stills2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1_nYjB2LdLlJE1kp2QrXDygYfaM8cCbyQUC1lUTVriMo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "IMAGES",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_nYjB2LdLlJE1kp2QrXDygYfaM8cCbyQUC1lUTVriMo/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Loop Over Items').item.json[\"Deliverable ID\"] }}",
+            "PROMPT": "={{ $('Prompt Engineer Stills2').item.json.output }}",
+            "GET": "={{ $json.images[0].url }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PROMPT",
+              "displayName": "PROMPT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GET",
+              "displayName": "GET",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        704,
+        912
+      ],
+      "id": "0a4a32bc-282f-4233-b80d-d46617822ebd",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "B5OyxSxpvH2s2kHU",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1184,
+        768
+      ],
+      "id": "c769df7f-401c-4226-b3a7-f03431b8e284",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -384,
+        928
+      ],
+      "id": "8a21a366-7c35-47f8-b5af-c78fde9661e0",
+      "name": "Wait6",
+      "webhookId": "7d15fc19-4cfb-4e95-a847-72b453887384"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://queue.fal.run/fal-ai/imagen4/preview/ultra",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n     \"prompt\": \"{{ $json.output }}\",\n     \"aspect_ratio\": \"16:9\",\n     \"seed\": \"42\"\n   }",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -592,
+        928
+      ],
+      "id": "7643f9fd-97e9-479e-9e70-0b39cd586c16",
+      "name": "ImageGen4-FAL1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "p1gpknzP0ASSuB4x",
+          "name": "FAL-PIXEL-API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.response_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        144,
+        912
+      ],
+      "id": "23aa2ea5-0d85-48af-953e-ed03035c885e",
+      "name": "GET-ImageGen4-FAL1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "p1gpknzP0ASSuB4x",
+          "name": "FAL-PIXEL-API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f5ee4b9f-d171-411f-a793-11a27591ed08",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "COMPLETED",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -96,
+        928
+      ],
+      "id": "2b7a96b7-04c4-4b01-ad5d-9914ea1fdb3e",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.status_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -240,
+        928
+      ],
+      "id": "b5ccab34-0804-4176-b5a8-e48da6cc2576",
+      "name": "GET-ImageGen4-FAL2",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "p1gpknzP0ASSuB4x",
+          "name": "FAL-PIXEL-API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## IMAGE GENERATION",
+        "height": 736,
+        "width": 2480,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1488,
+        672
+      ],
+      "id": "a029078a-3468-4f93-ac71-229a091eedd3",
+      "name": "Sticky Note18"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        240
+      ],
+      "id": "012618b8-5093-4aa7-a313-1f6d0103ae88",
+      "name": "Wait5",
+      "webhookId": "2e8934b3-e425-4519-b5af-8c7c1d348551"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.images[0].url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        352,
+        912
+      ],
+      "id": "f0fea70c-9159-412c-97a2-8b188a5041c0",
+      "name": "GETBINRAYIMAGE",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "p1gpknzP0ASSuB4x",
+          "name": "FAL-PIXEL-API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You will ingest different extracted text from documents, notes, comments, and information in any format to then structure it without losing any context or important information, do not invent new information only use input for formatting it into organized simple text output. Avoid monksflow, asset planner 'static assets mentioned' and things that are not relevant for image generation, video generation or creative direction meant for brand style generation. This is the text {{ $json.content.parts[0].text }}",
+        "options": {
+          "systemMessage": "=You are an Ingest Agent for a generative video workflow. Read mixed inputs and return one clean JSON object only. Keep only information that directly helps brand-consistent image generation, image-to-video, and creative direction. Ignore Asset Planner, monksflow internals, deliverable inventories, logistics, staffing, budgets, timelines, pricing, software setup, file paths, or tool names unless they describe the look or behavior of visuals.\n\nReturn exactly this JSON and nothing else:\n{\n\"Creative elements\": \"<short description of core idea, themes, or hooks from input>\",\n\"Visual Style\": \"<how it should look and feel: tone, atmosphere, colors, lighting, seasonality if mentioned>\",\n\"Seasonality\": \"<season if present, else 'Not specified'>\",\n\"Color Palette\": \"<explicit palette words if present, else 'Not specified'>\",\n\"Brand essence\": \"<how the brand should come across: voice, positioning, subtle cues>\",\n\"Avoid\": \"<explicit visuals, tones, moods, settings, or motifs to avoid if mentioned, else 'Not specified'>\",\n\"Legal guardrails\": \"<short description of restrictions or sensitivities for AI imagery or video, else 'Not specified'>\"\n}\n\nNormalization rules:\n\nKeep language concise and neutral\n\nUse 'Not specified' when missing\n\nDo not invent details"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -7872,
+        592
+      ],
+      "id": "7436f0c1-23dc-49ea-9306-5b9d2e1bc2b1",
+      "name": "Brief ingest"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -8864,
+        544
+      ],
+      "id": "82403620-2db8-4000-bd35-9767df49750a",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -8864,
+        704
+      ],
+      "id": "6bed7303-16a3-497b-a7f7-fbf8250a5201",
+      "name": "Extract from File2"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "=xlsx data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -8736,
+        704
+      ],
+      "id": "441f752d-ecba-4a92-821f-c19fc90230ca",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "=pdf data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -8736,
+        544
+      ],
+      "id": "9742b34d-aeb4-41f8-b26a-3bbaa284e125",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "content": "## SETUP DRIVE FOLDER",
+        "height": 480,
+        "width": 2272,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -10288,
+        432
+      ],
+      "typeVersion": 1,
+      "id": "e28ef376-ee3f-41fd-9d4e-c09ea97bf05a",
+      "name": "Sticky Note12",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nlet mergedText = \"\";\n\nif (data['concatenated_pdf_data']) {\n  mergedText += data['concatenated_pdf_data'] + \"\\n\";\n}\n\nif (data['concatenated_xlsx_data']) {\n  mergedText += data['concatenated_xlsx_data'] + \"\\n\";\n}\n\nreturn [{ mergedText }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -8256,
+        624
+      ],
+      "id": "dde5865d-adb2-4692-a475-80de069454e4",
+      "name": "Code"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -8448,
+        624
+      ],
+      "id": "9ceb42db-2015-4502-abb8-2cedd357f2ea",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.prompt }}",
+        "options": {
+          "systemMessage": "=You are a Deliverable Transformer for a generative video workflow. Parse the user’s free-form request and potentially mergedtext for additional brand information you have to combine intto the deliverables list. Only focus on the information that would be useful for ai image and video generation, no copy etc.\nReturn a clean JSON object with a normalized list of deliverables. Do not invent assets, counts, types, or durations. Use contextual cues only.\n\nOutput the \"User Prompt\": \"<verbatim description from user...>\" and after that output JSON schema for each deliverable:\n\n{\n  \"Deliverable ID\": \"<stable label in stated order: Asset 01, Asset 02, ...>\",\n  \"Base description\": \"<short verbatim/or contextual description from user>\",\n  \"Creative elements\": \"<from input or 'Not specified'>\",\n  \"Visual Style\": \"<from input or 'Not specified'>\",\n  \"Seasonality\": \"<from input or 'Not specified'>\",\n  \"Color Palette\": \"<from input or 'Not specified'>\",\n  \"Brand essence\": \"<from input or 'Not specified'>\",\n  \"Avoid\": \"<from input or 'Not specified'>\",\n  \"Legal guardrails\": \"<from input or 'Not specified'>\",\n  \"ImageSpec\": { <include only technical details such as aspect ratios, resolution, safe zones if present. If none are provided, output an empty object {}> },\n  \"VideoSpec\": { <include only technical details such as aspect ratios, duration, fps, resolution if present. If none are provided, output an empty object {}> }\n}\n\nNormalization rules:\n- Preserve user order; expand grouped counts deterministically\n- Only fill Prompt if it’s verbatim prompt-like language, else 'Not specified'\n- Use 'Not specified' for absent descriptive fields\n- Always return \"ImageSpec\" and \"VideoSpec\" as objects. If no technical info is given, leave them as {} (do not write 'Not specified' inside)\n- No prose, no code fences, only valid JSON\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -9904,
+        1152
+      ],
+      "id": "27f0d2f4-4a08-40ca-89c1-9a15d4c62269",
+      "name": "USER PROMPT"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -6608,
+        896
+      ],
+      "id": "1e324023-7b3b-49fd-8069-75c53443bd60",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  mergedText: $('Edit Fields17').first().json['USER PROMPT'] + \"\\n\" + $input.first().json.brand_information\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -6416,
+        880
+      ],
+      "id": "02d553c0-bd40-4cb6-8026-1daf1daba4eb",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "content": "## DEBRIEF",
+        "height": 448,
+        "width": 752,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -6704,
+        784
+      ],
+      "id": "9a60166c-c6c5-406d-98f3-a9ab275a0b9e",
+      "name": "Sticky Note14",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -6256,
+        1024
+      ],
+      "id": "9e71a76a-d2bf-4f0d-adc4-caac25e6fb31",
+      "name": "Google Gemini Chat Model10",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b9d7087b-ce92-402a-8cac-926af98ab5a6",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -5792,
+        880
+      ],
+      "id": "b9b1d542-c9c5-4172-a51c-6e1213f39f98",
+      "name": "Edit Fields10"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Avoid any mentions of copy needed, or text, headlines, asset planner, monksflow or logo. The information you extract should only be relevant to image and video generation and creative direction for image generation. Based on the user prompt and considering brand tone feel and style that I will attach below, create the deliverables list: {{ $json.mergedText }}",
+        "options": {
+          "systemMessage": "=You are a Debriefing Agent in a generative video workflow. Your task is to take the user’s requested deliverables and merge them with upstream brand/context information produced by the Ingest Agent. You must not invent or add new deliverables. You produce one clean JSON object for the Creative Director to consume next.\n\nInputs\n\nuser_prompt: free-form user request with deliverables (may include counts, durations, technical specs).\n\ningest_context: an object that may include the following keys (any may be missing):\n\n\"Creative elements\", \"Visual Style\", \"Seasonality\", \"Color Palette\", \"Brand essence\", \"Avoid\", \"Legal guardrails\"\n\nWhat to do\n\nParse deliverables exactly as stated in user_prompt. Preserve order. If the user groups counts (e.g., “6 images”), expand deterministically (Asset 01…).\n\nFor each deliverable, merge in the brand/context from ingest_context.\n\nIf the user explicitly provides a value that conflicts with brand/context, prefer the user’s verbatim value only for that field on that deliverable.\n\nCarry through technical specs if they are present in the user prompt (aspect ratios, duration, fps, resolution). If absent, leave empty {} for ImageSpec / VideoSpec.\n\nDo not include platforms, planning tools, budgets, or any operational notes.\n\nOutput\nReturn exactly this JSON and nothing else:\n\n{\n\"DELIVERABLES\": [\n{\n\"Deliverable ID\": \"<verbatim ID or stable label in correct order (Asset 01, Asset 02, ...)>\",\n\"Duration\": \"<verbatim duration if any, else 'Not specified'>\",\n\"Base description\": \"<short verbatim description from user_prompt for this deliverable>\",\n\"Creative elements\": \"<from ingest_context or 'Not specified'>\",\n\"Visual Style\": \"<from ingest_context or 'Not specified'>\",\n\"Seasonality\": \"<from ingest_context or 'Not specified'>\",\n\"Color Palette\": \"<from ingest_context or 'Not specified'>\",\n\"Brand essence\": \"<from ingest_context or 'Not specified'>\",\n\"Avoid\": \"<from ingest_context or 'Not specified'>\",\n\"Legal guardrails\": \"<from ingest_context or 'Not specified'>\",\n\"ImageSpec\": { <only technical details such as aspect ratios, resolution, safe zones if present; else {}> },\n\"VideoSpec\": { <only technical details such as aspect ratios, duration, fps, resolution if present; else {}> }\n}\n]\n}\n\nNormalization rules\n\nDo not invent assets, counts, types, or durations.\n\nKeep exact casing of output keys shown above.\n\n“ImageSpec” and “VideoSpec” must always be objects; if no technical info, output {} (never the string \"Not specified\" inside).\n\nUse \"Not specified\" only for the descriptive fields listed above when missing.\n\nNo code fences, no prose, valid JSON only.\n\nConflict resolution\n\nUser prompt overrides per-deliverable values (e.g., a specific season or ratio for that deliverable).\n\nBrand/ingest fills the rest (default context).\n\nFor “Avoid” and “Legal guardrails”, union values (combine; do not drop existing restrictions)."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -6256,
+        880
+      ],
+      "id": "c07a5c16-ee46-40f3-87da-e535e549530c",
+      "name": "Debriefer1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -7872,
+        816
+      ],
+      "id": "b08a88b0-07be-4231-a790-97bf0ab8263c",
+      "name": "Google Gemini Chat Model15",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b9d7087b-ce92-402a-8cac-926af98ab5a6",
+              "name": "brand_information",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -7472,
+        592
+      ],
+      "id": "0c528129-6c03-40bb-8b45-123485c893f1",
+      "name": "Edit Fields16"
+    },
+    {
+      "parameters": {
+        "content": "## INGESTION AGENT",
+        "height": 528,
+        "width": 688,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -7968,
+        448
+      ],
+      "id": "0352d4d2-2fae-4292-ac37-cbcdfe1f6f26",
+      "name": "Sticky Note27"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "14932152-6961-4f0e-81fc-f7d562bb7f55",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": ".pdf",
+              "operator": {
+                "type": "string",
+                "operation": "endsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -9040,
+        544
+      ],
+      "id": "2358bd9f-5757-46d1-9a8f-649bc615f758",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "14932152-6961-4f0e-81fc-f7d562bb7f55",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": ".xlsx",
+              "operator": {
+                "type": "string",
+                "operation": "endsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -9040,
+        720
+      ],
+      "id": "9d83ee88-49ef-424f-a26e-db836846d3bd",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -5664,
+        880
+      ],
+      "id": "519ea706-5c44-4892-b733-32da84d8d1ef",
+      "name": "Wait10",
+      "webhookId": "3c4a37ab-df40-4d9f-87eb-da589e0faa19"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -9904,
+        1296
+      ],
+      "id": "6c65dc4f-bd32-4d4b-879f-e0fc45c725b5",
+      "name": "Google Gemini Chat Model16",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "33107bf9-ecb3-4708-833f-0892515671b4",
+              "name": "USER PROMPT",
+              "value": "={{ $json.DELIVERABLES }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -9488,
+        1152
+      ],
+      "id": "b6f2da29-292c-4ffd-a438-78ca1651e44b",
+      "name": "Edit Fields17"
+    },
+    {
+      "parameters": {
+        "content": "## CREATIVE DIRECTOR",
+        "height": 736,
+        "width": 784,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -5872,
+        784
+      ],
+      "id": "18019723-7fb4-4e19-9e51-851ed090deaf",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -5488,
+        1088
+      ],
+      "id": "6112dcf6-612c-4223-8242-42544fb8c17f",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=From the provided {{ $json.output }} cinematically and creatively extend the Scene description for each deliverable. Keeping the initial number of asset requests. \nFollow your System Instructions to work as a Creative Director to output a proper creative brief for the user requested assets.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an **AI Creative Director**.\nYour job is to **translate a client brief or user request into fully fleshed-out creative scene descriptions and ideas**, aligned with client guidelines, style references, and asset requirements.\nYou **set the creative vision** for projects by defining visual direction, conceptual framing, and executional detail that can be used by creative teams (designers, cinematographers, 3D artists, editors, animators).\n\n---\n\n## Core Responsibilities\n\n1. **Interpret Briefs & Guidelines**\n\n   * Read and analyze the provided input: client guidelines, brand style rules, and user brief.\n   * Respect brand identity, tone, compliance notes, and artistic direction.\n   * Identify the type and number of assets required (e.g., film scenes, renders, storyboards, moodboards).\n\n2. **Creative Direction**\n\n   * Define **visual style** (overall look & feel, aesthetic direction, design inspiration).\n   * Specify **color palette** choices and their emotional/brand rationale.\n   * Suggest **lighting approaches** (natural, stylized, cinematic, high-contrast, soft, etc.).\n   * Propose **camera framing and angles** (wide establishing shot, dolly zoom, handheld POV, overhead drone, close-up macro, etc.).\n   * Recommend **movement or transitions** where relevant (cut, dissolve, tracking shot, whip pan).\n   * Integrate client’s brand codes and personality into the creative execution.\n\n3. **Scene & Asset Ideation**\n\n   * Provide **detailed scene descriptions** for each requested asset.\n   * Incorporate **setting, characters, objects, motion, atmosphere, and tone**.\n   * Suggest **props, wardrobe, or textures** consistent with the vision.\n   * Ensure ideas balance **conceptual storytelling** with **practical production feasibility**.\n\n---\n\n## Output Format\n\nThe output should always be structured and professional, easy for a production or design team to follow.\nUse the following structure:\n\n### Creative Vision Overview\n\n* **Concept Theme:**\n* **Visual Style Direction:**\n* **Color Palette & Mood:**\n* **Cinematography Approach:**\n* **Client Style Integration:**\n\n### Scene Breakdown\n\nFor each scene or asset, provide:\n\n**Scene \\[#]: \\[Title/Short Identifier]**\n\n* **Description:** A vivid, cinematic description of the scene.\n* **Setting & Environment:** Where it takes place and key design elements.\n* **Camera Direction:** Angle, framing, movement.\n* **Lighting & Mood:** Atmosphere and tonal direction.\n* **Color & Texture Notes:** Key hues, contrasts, finishes.\n* **Talent/Characters/Props (if applicable):** Specific roles, objects, or details.\n* **Notes on Brand Alignment:** How this scene reflects client’s style/guidelines.\n\n\n## Creative Principles\n\n* Always align with the **client’s brand identity and guidelines**.\n* Ideas should be **cinematic, detailed, and imaginative**, but also **actionable** for production teams.\n* Be **precise, visual, and evocative** — avoid vagueness.\n* If multiple stylistic interpretations are possible, propose **alternatives** while highlighting the strongest direction.\n* Ensure **consistency across scenes** while maintaining variation for engagement.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -5456,
+        880
+      ],
+      "id": "c51b9051-a825-4e29-89e9-b24aee9b6f68",
+      "name": "Creative Director",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "pdf data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        -8608,
+        544
+      ],
+      "id": "46427460-e788-4e4a-b960-1e66ddbc9e53",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "xlsx data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        -8608,
+        704
+      ],
+      "id": "9c86cada-c67c-4b73-b058-e0d75a90be3f",
+      "name": "Summarize1"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"DELIVERABLES\": {\n      \"type\": \"array\",\n      \"minItems\": 1,\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"Deliverable ID\": {\n            \"type\": \"string\",\n            \"minLength\": 1\n            \n          },\n          \"Scene description\": {\n            \"type\": \"string\",\n            \"minLength\": 1,\n            \"description\": \"Cinematic, frame-level description derived from Creative elements, Visual Style, Seasonality, Color Palette, Brand essence; must honor Avoid and Legal guardrails\"\n          },\n          \"Camera Movements\": {\n            \"type\": \"string\",\n            \"minLength\": 1,\n            \"description\": \"Concise motion path or 'Static' if none\"\n          },\n          \"Lighting & Mood\": {\n            \"type\": \"string\",\n            \"minLength\": 1,\n            \"description\": \"Atmosphere and tonal direction\"\n          }\n        },\n        \n        \"required\": [\"Deliverable ID\", \"Scene description\", \"Camera Movements\", \"Lighting & Mood\"],\n        \"additionalProperties\": false\n      }\n    }\n  },\n  \"required\": [\"DELIVERABLES\"],\n  \"additionalProperties\": false\n}\n",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -5440,
+        1296
+      ],
+      "id": "acd357dd-0881-4d26-bb79-b1ab608b571a",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "jsCode": "function stripFences(s) {\n  if (typeof s !== 'string') return s;\n  const m = s.match(/```[a-zA-Z]*\\n([\\s\\S]*?)```/);\n  return m ? m[1].trim() : s.trim();\n}\nfunction safeParse(x) {\n  if (typeof x === 'object') return x;\n  try { return JSON.parse(x); } catch { return null; }\n}\nfunction ensureShape(data) {\n  if (Array.isArray(data)) return { DELIVERABLES: data };\n  if (data && typeof data === 'object' && Array.isArray(data.DELIVERABLES)) return data;\n  if (data && typeof data.output === 'string') {\n    const inner = safeParse(stripFences(data.output));\n    if (Array.isArray(inner)) return { DELIVERABLES: inner };\n    if (inner && Array.isArray(inner.DELIVERABLES)) return inner;\n  }\n  return { DELIVERABLES: [data] };\n}\n\n// Only coerce spec containers to {} when missing/wrong type.\n// Do NOT inject \"Not specified\" into spec objects.\nfunction coerceSpecs(d) {\n  if (typeof d.ImageSpec === 'string' || !d.ImageSpec || typeof d.ImageSpec !== 'object') d.ImageSpec = {};\n  if (typeof d.VideoSpec === 'string' || !d.VideoSpec || typeof d.VideoSpec !== 'object') d.VideoSpec = {};\n  return d;\n}\n\nfunction clean(obj) {\n  const DROP = new Set(['Not specified', 'Not applicable', '', ' ']);\n  if (Array.isArray(obj)) {\n    return obj.map(clean).filter(v => {\n      if (typeof v === 'string') return !DROP.has(v);\n      if (Array.isArray(v)) return v.length > 0;\n      if (v && typeof v === 'object') return Object.keys(v).length > 0;\n      return v !== undefined && v !== null;\n    });\n  } else if (obj && typeof obj === 'object') {\n    const out = {};\n    for (const [k, v] of Object.entries(obj)) {\n      const cv = clean(v);\n      const dropStr = (typeof cv === 'string') && DROP.has(cv);\n      const emptyArr = Array.isArray(cv) && cv.length === 0;\n      const emptyObj = cv && typeof cv === 'object' && !Array.isArray(cv) && Object.keys(cv).length === 0;\n      // keep empty {} ONLY for ImageSpec/VideoSpec so downstream knows the fields exist\n      const isSpecKey = (k === 'ImageSpec' || k === 'VideoSpec');\n      if (!dropStr && !emptyArr && (!emptyObj || isSpecKey)) out[k] = cv;\n    }\n    return out;\n  }\n  return obj;\n}\n\nconst out = [];\nfor (const item of items) {\n  let raw = item.json;\n  if (typeof raw === 'string') raw = stripFences(raw);\n  if (typeof raw === 'string') raw = safeParse(raw) || { output: raw };\n\n  let normalized = ensureShape(raw);\n\n  // coerce spec containers for every deliverable\n  if (Array.isArray(normalized.DELIVERABLES)) {\n    normalized.DELIVERABLES = normalized.DELIVERABLES.map(coerceSpecs);\n  }\n\n  // prune \"Not specified\" strings etc., but keep empty {} for ImageSpec/VideoSpec\n  normalized = clean(normalized);\n\n  out.push({ json: normalized });\n}\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -9648,
+        1152
+      ],
+      "id": "f52af730-67f6-44a6-aad3-513fc1bff707",
+      "name": "Code13"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -5728,
+        1376
+      ],
+      "id": "120339ab-3f05-44c9-83d7-f1fcaed8e0b0",
+      "name": "Google Gemini Chat Model11",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## USER PROMPT HANDLING\n",
+        "height": 448,
+        "width": 1872,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -10256,
+        1056
+      ],
+      "id": "b77d5c62-8dbc-4d5a-96a8-e196cd65aa15",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "=https://drive.google.com/drive/folders/1s7OcxvGr50wDiFTCMcBiQmiFH42NcXdl",
+            "mode": "url"
+          },
+          "whatToSearch": "files"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        9744,
+        -1344
+      ],
+      "id": "40599393-9c68-4a0c-8931-9176bf3dd5f6",
+      "name": "Search files and folders",
+      "executeOnce": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        10400,
+        -1216
+      ],
+      "id": "1ef7b515-aaf0-4104-8bfb-894895ac5770",
+      "name": "Download file",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=D:/n8n/Europcar/input/{{ $json.name }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        10544,
+        -1216
+      ],
+      "id": "31c75932-8b7b-4725-8d65-024417d4e509",
+      "name": "Read/Write Files from Disk",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "You are a video transcription and scene analysis agent. Your role is to analyze a full video file and return a detailed, structured representation of its narrative segments.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        10400,
+        -1072
+      ],
+      "id": "addc096a-3d39-448d-80e8-8421f27c3e1a",
+      "name": "Analyze video",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Make a simple edit with these provided Videos: {{ JSON.stringify($json.clips, null, 2) }} to create 15s videos, each clip should be 5 seconds long, if a video is longer trim it. \nGroup them following the initial User Prompt: \n\nMake 2 Edits.\nFirst edit:\nScene 1: Charging Plug in car\nScene 2: Scenic Drive (mountain)\nScene 3: Scenic Drive 2 (inside the car POV autumn road)\nSecond edit:\nScene 1: Car in front of hotel (cozy)\nScene 2: Luxury car interior\nScene 3: Man out of car in confidence\n\n",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an intelligent LLM-based Video Editing Agent.\n\nYour primary task is to receive two JSON inputs:\n\n1. **Clips Data**: A JSON array containing video clips, each with:\n\n   * `NAME`: The name of the video file.\n   * `PATH`: The path of the video file.\n   * `DESCRIPTION`: A brief description of the clip content.\n\n2. **User Editing Instructions**: Text-based instructions detailing how the user wants the final video edited. These instructions may include specific content requests, ordering preferences, trimming guidelines, or style suggestions.\n\nYou must output a JSON object structured as follows:\n\n```json\n{\n  \"EditedVideo01\": [\n    {\n      \"ID\": 1,\n      \"FileName\": \"example_clip.mp4\",\n      \"Trim\": {\n        \"Start\": \"00:00:05\",\n        \"End\": \"00:00:25\"\n      }\n    },\n    {\n      \"ID\": 2,\n      \"FileName\": \"second_example.mp4\",\n      \"Trim\": null\n    },\n    {\n      \"ID\": 3,\n      \"FileName\": \"third_example.mp4\",\n      \"Trim\": {\n        \"Start\": \"00:00:05\",\n        \"End\": \"00:00:15\"\n      }\n    },\n  \"EditedVideo02\": [\n    {\n      \"ID\": 1,\n      \"FileName\": \"example_clip.mp4\",\n      \"Trim\": {\n        \"Start\": \"00:00:05\",\n        \"End\": \"00:00:15\"\n      }\n    },\n    {\n      \"ID\": 2,\n      \"FileName\": \"second_example.mp4\",\n      \"Trim\": null\n    },\n    {\n      \"ID\": 3,\n      \"FileName\": \"third_example.mp4\",\n      \"Trim\": {\n        \"Start\": \"00:00:05\",\n        \"End\": \"00:00:15\"\n      }\n    },\n    // Additional Edited Videos...\n  ]\n}\n```\n\n### Requirements:\n\n* **ID**: Indicates the playback order of each clip in the final edit.\n* **FileName**: Matches exactly the original filenames provided.\n* **FilePath**: The Path of the Video File.\n\n  * If trimming is necessary, provide the exact start and end timestamps.\n  * If no trimming is needed, set this field to `null`.\n* Ensure the edited output precisely follows user instructions, clearly interpreting implicit and explicit requests.\n\n### Guidelines:\n\n* Maintain logical flow and coherence.\n* If instructions imply selecting clips based on descriptions, choose clips best matching the user's intent.\n* If instructions mention stylistic editing (e.g., highlights, montages, transitions), carefully infer and apply trims accordingly.\n* Default timestamp format: `HH:MM:SS`.\n\nYour output must always be precise, well-structured, and ready for immediate implementation in an editing workflow.\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        11280,
+        -1360
+      ],
+      "id": "8ee940cd-1092-407a-a4be-b8e7feaaa8f2",
+      "name": "OFFLINE EDITOR",
+      "retryOnFail": true,
+      "alwaysOutputData": false,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://example.com/video-editing-output.schema.json\",\n  \"title\": \"Edited Video Output\",\n  \"type\": \"object\",\n  \"patternProperties\": {\n    \"^EditedVideo\\\\d{2,}$\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"required\": [\"ID\", \"FileName\", \"FilePath\", \"Trim\"],\n        \"properties\": {\n          \"ID\": {\n            \"type\": \"integer\",\n            \"minimum\": 1\n          },\n          \"FileName\": {\n            \"type\": \"string\",\n            \"minLength\": 1\n          },\n          \"FilePath\": {\n            \"type\": \"string\",\n            \"minLength\": 1\n          },\n          \"Trim\": {\n            \"anyOf\": [\n              {\n                \"type\": \"object\",\n                \"required\": [\"Start\", \"End\"],\n                \"properties\": {\n                  \"Start\": {\n                    \"type\": \"string\",\n                    \"pattern\": \"^\\\\d{2}:\\\\d{2}:\\\\d{2}$\",\n                    \"description\": \"Start time in HH:MM:SS format\"\n                  },\n                  \"End\": {\n                    \"type\": \"string\",\n                    \"pattern\": \"^\\\\d{2}:\\\\d{2}:\\\\d{2}$\",\n                    \"description\": \"End time in HH:MM:SS format\"\n                  }\n                },\n                \"additionalProperties\": false\n              },\n              {\n                \"type\": \"null\"\n              }\n            ]\n          }\n        },\n        \"additionalProperties\": false\n      },\n      \"minItems\": 1\n    }\n  },\n  \"additionalProperties\": false\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        11424,
+        -1088
+      ],
+      "id": "dbabeede-bc68-48ad-8f83-f065d8b44410",
+      "name": "Structured Output Parser",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        11280,
+        -1088
+      ],
+      "id": "31dad163-7396-48f9-9e6d-b9fd6a4501e8",
+      "name": "Google Gemini Chat Model1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "command": "={{ $json.command }}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        14176,
+        -1184
+      ],
+      "id": "84979f03-7375-48a2-96af-7ca594689495",
+      "name": "Execute Command1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        11808,
+        -1264
+      ],
+      "id": "62f0c88a-697d-4920-a6db-d3c235570cbb",
+      "name": "Loop Over Items1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    video: $items().map(item => item.json)\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        12000,
+        -1184
+      ],
+      "id": "fb12c0c7-8714-4c72-8e00-cf255a3ecb94",
+      "name": "Code7",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=KEEP THIS EXACTLY AS IT IS BUT REPLACE the \"final_output.mp4\" with a random word and mp4. {{ $json.text }}\n\nDo not add ** to the naming. Only letters. and ALWAYS end with .mp4",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        13504,
+        -1184
+      ],
+      "id": "79c445bf-600f-4adb-b6d2-9a2d1fcdeff1",
+      "name": "Basic LLM Chain1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        13504,
+        -960
+      ],
+      "id": "fa203b73-6bf9-4401-8b4c-adcd198d9777",
+      "name": "Google Gemini Chat Model4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        11616,
+        -1360
+      ],
+      "id": "eba2d050-a594-42ab-a9c2-1aaf4f36a519",
+      "name": "Split Out2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bd969a0b-5d33-4c9c-8071-7ae0725fdfac",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        15424,
+        -1200
+      ],
+      "id": "77000d3f-a3fc-44dc-94d0-313876a88d9e",
+      "name": "Edit Fields5",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## XML STUFF\nThis LLM Takes all the data about the clips and creates a JSON File (in the output parser) with all the info to create the XML.\n\nSequence settings\n• Resolution (e.g. 1920×1080)\n• Frame rate (e.g. 24, 25, 30 fps)\n\nMedia clips\n• File names (and paths) of your video/audio assets\n• In/out timecodes (or durations) for each clip\n\nTrack layout\n• How many video tracks? audio tracks?\n• On which track should each clip reside?\n\nClip order and timing\n• The sequence order (which clip goes first, second, etc.)\n• Any gaps or overlaps (transitions) between clips",
+        "height": 528,
+        "width": 1248,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        14608,
+        -1360
+      ],
+      "typeVersion": 1,
+      "id": "5b570760-9bf3-488b-a3cd-314e9942a429",
+      "name": "Sticky Note1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"title\": \"FFmpegClipArray\",\n  \"type\": \"array\",\n  \"items\": {\n    \"type\": \"object\",\n    \"required\": [\n      \"clipName\",\n      \"clipPath\",\n      \"in\",\n      \"out\",\n      \"duration\",\n      \"durationSeconds\",\n      \"width\",\n      \"height\"\n    ],\n    \"properties\": {\n      \"clipName\": {\n        \"type\": \"string\",\n        \"description\": \"The filename of the output clip (e.g., 'clip_1.mp4')\"\n      },\n      \"clipPath\": {\n        \"type\": \"string\",\n        \"description\": \"Full path to the output MP4 file (e.g., 'D:\\\\\\\\n8n\\\\\\\\video-output\\\\\\\\clip_1.mp4')\"\n      },\n      \"in\": {\n        \"type\": \"string\",\n        \"pattern\": \"^\\\\d{2}:\\\\d{2}:\\\\d{2}(\\\\.\\\\d{1,3})?$\",\n        \"description\": \"Start time of the clip (from -ss), formatted as HH:MM:SS or HH:MM:SS.ms\"\n      },\n      \"out\": {\n        \"type\": \"string\",\n        \"pattern\": \"^\\\\d{2}:\\\\d{2}:\\\\d{2}(\\\\.\\\\d{1,3})?$\",\n        \"description\": \"End time of the clip, calculated as in + duration\"\n      },\n      \"duration\": {\n        \"type\": \"string\",\n        \"pattern\": \"^\\\\d{2}:\\\\d{2}:\\\\d{2}(\\\\.\\\\d{1,3})?$\",\n        \"description\": \"Duration of the clip in HH:MM:SS or HH:MM:SS.ms format\"\n      },\n      \"durationSeconds\": {\n        \"type\": \"number\",\n        \"minimum\": 0,\n        \"description\": \"Duration converted to seconds as a float\"\n      },\n      \"width\": {\n        \"type\": \"integer\",\n        \"enum\": [1920],\n        \"description\": \"Video width in pixels (assumed to be 1920)\"\n      },\n      \"height\": {\n        \"type\": \"integer\",\n        \"enum\": [1080],\n        \"description\": \"Video height in pixels (assumed to be 1080)\"\n      }\n    },\n    \"additionalProperties\": false\n  }\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        15280,
+        -1024
+      ],
+      "id": "7e07839c-7a8b-4c08-a150-e82743a88077",
+      "name": "Structured Output Parser2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create an XML JSON Configuration file from this FFMPEG command {{ $('Code11').item.json.command }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "FFmpeg Clip JSON Parser Agent\n\nYou are an Agent designed to parse an FFmpeg command that concatenates video clips into a full video. Your goal is to transform these commands into a structured JSON array, where each object represents one extracted clip and includes precise metadata.\n\nInput Format:\nA single string containing one or more FFmpeg commands EXAMPLE:\n```\n(echo file 'D:/n8n/Europcar/input/Static1B_6ea82cfc-3c04-4b04-926e-80c7457866c7.mp4' & echo file 'D:/n8n/Europcar/input/Static2A_941b744f-8584-481f-8f1a-ed67a0f16c52.mp4' & echo file 'D:/n8n/Europcar/input/Static2A_d7f35bc2-fc12-4afa-937d-a2fff949ce90.mp4') > \"D:\\n8n\\Europcar\\output\\file_list.txt\" && ffmpeg -f concat -safe 0 -i \"D:\\n8n\\Europcar\\output\\file_list.txt\" -c copy \"D:\\n8n\\Europcar\\output\\whirlwind.mp4\n```\n\nOutput Format:\nA JSON array. Each object in the array must contain metadata for **one clip**, extracted from the command.\nJSON Structure for Each Clip:\n```json\n{\n  \"clipName\": \"Static1B_6ea82cfc-3c04-4b04-926e-80c7457866c7.mp4\",\n  \"clipPath\": \"D:/n8n/Europcar/input/Static1B_6ea82cfc-3c04-4b04-926e-80c7457866c7.mp4\",\n  \"in\": \"00:00:00\",\n  \"out\": \"00:00:05\",\n  \"duration\": \"00:00:05\",\n  \"durationSeconds\": 5,\n  \"width\": 1920,\n  \"height\": 1080\n}\n```\nExtraction Rules:\n1. **clipName**: Extract the filename from the final quoted string in the command (e.g., `clip_1.mp4`).\n2. **clipPath**: Full path to the output MP4 file (final argument in each command).\n3. **in**: Value of `-ss`, in `HH:MM:SS` or `HH:MM:SS.ms` format.\n4. **out**: Calculate as `in + duration` (if you can't do the math, set this equal to `duration`).\n5. **duration**: Value of `-t` in `HH:MM:SS` or `HH:MM:SS.ms`.\n6. **durationSeconds**: Convert `duration` to seconds as a float (e.g., \"00:00:05.500\" = 5.5).\n7. **width**: Always set to `1920`.\n8. **height**: Always set to `1080`.\n\nConstants:\n* **Resolution**: Assume all clips are 1920x1080 unless explicitly stated otherwise in the command.\n* **Frame rate**: Assume 24fps.\n\nConstraints:\n* Do not infer values not present in the command.\n* If a duration is malformed, skip that clip or return an error.\n* Ensure valid escaping for all backslashes in Windows paths (`\\\\`).\n\nExample Input:\n```\n(echo file 'D:/n8n/Europcar/input/Static1B_6ea82cfc-3c04-4b04-926e-80c7457866c7.mp4' & echo file 'D:/n8n/Europcar/input/Static2A_941b744f-8584-481f-8f1a-ed67a0f16c52.mp4' & echo file 'D:/n8n/Europcar/input/Static2A_d7f35bc2-fc12-4afa-937d-a2fff949ce90.mp4') > \"D:\\n8n\\Europcar\\output\\file_list.txt\" && ffmpeg -f concat -safe 0 -i \"D:\\n8n\\Europcar\\output\\file_list.txt\" -c copy \"D:\\n8n\\Europcar\\output\\whirlwind.mp4\n```\n\nExample Output:\n```json\n[\n  {\n    \"clipName\": \"Static1B_6ea82cfc-3c04-4b04-926e-80c7457866c7.mp4\",\n    \"clipPath\": \"D:/n8n/Europcar/input/Static1B_6ea82cfc-3c04-4b04-926e-80c7457866c7.mp4\",\n    \"in\": \"00:00:00\",\n    \"out\": \"00:00:05\",\n    \"duration\": \"00:00:05\",\n    \"durationSeconds\": 5,\n    \"width\": 1920,\n    \"height\": 1080\n  },\n  {\n    \"clipName\": \"Static2A_941b744f-8584-481f-8f1a-ed67a0f16c52.mp4\",\n    \"clipPath\": \"D:/n8n/Europcar/input/Static2A_941b744f-8584-481f-8f1a-ed67a0f16c52.mp4\",\n    \"in\": \"00:00:05\",\n    \"out\": \"00:00:10\",\n    \"duration\": \"00:00:05\",\n    \"durationSeconds\": 5,\n    \"width\": 1920,\n    \"height\": 1080\n  }\n]\n```\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        15120,
+        -1184
+      ],
+      "id": "922a4b17-e8b4-41a8-b7d9-8c098cf699e6",
+      "name": "FFmpeg Clip JSON Parser Agent",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        15616,
+        -1200
+      ],
+      "id": "4bdea92c-682c-4962-8a7b-0c168096be1f",
+      "name": "Code8",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=From the provided .json file, can you create an XML with these clips on a timeline that I can import into Premiere Pro to edit these clips? \n{{ JSON.stringify($json.output,null,1) }}",
+        "options": {
+          "systemMessage": "=You are a specialized AI assistant that converts video clip metadata into Premiere Pro-compatible XML files. Your primary function is to generate XMEML format files that can be imported directly into Adobe Premiere Pro.\n\n## Core Responsibilities:\n- Convert JSON clip data into valid XMEML format\n- Create sequential timeline arrangements of video clips\n- Maintain proper timecode and frame rate calculations\n- Generate importable XML files for Premiere Pro\n\n## Input Processing:\nWhen provided with JSON containing video clip data, extract:\n- `clipName`: Video file name\n- `clipPath`: Full file path to video\n- `in`/`out`: Timecode in/out points\n- `duration`: Clip duration\n- `width`/`height`: Video resolution\n- Any additional metadata\n\n## XML Generation Rules:\n1. **Format**: Always use XMEML version 4\n2. **Timebase**: Default to 60fps (timebase=60) unless specified\n3. **Frame Conversion**: Convert seconds to frames (multiply by timebase)\n4. **File Paths**: Convert Windows paths to proper file:// URLs\n5. **Sequential Layout**: Place clips consecutively on timeline\n6. **Resolution**: Use clip dimensions for samplecharacteristics\n\n## Standard Template Structure:\n```xml\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xmeml version=\"4\">\n  <sequence id=\"sequence-1\">\n    <name>Generated Sequence</name>\n    <duration>[total_frames]</duration>\n    <rate><ntsc>FALSE</ntsc><timebase>60</timebase></rate>\n    <media><video>\n      <format><samplecharacteristics>\n        <rate><ntsc>FALSE</ntsc><timebase>60</timebase></rate>\n        <width>[width]</width><height>[height]</height>\n        <pixelaspectratio>square</pixelaspectratio>\n      </samplecharacteristics></format>\n      <track>\n        <!-- Generate clipitem for each video -->\n      </track>\n    </video></media>\n  </sequence>\n</xmeml>\n```\n\n## Response Format:\n- Provide complete, valid XML code in markdown code blocks\n- Include brief import instructions\n- No explanations unless requested\n- Ensure proper XML formatting and indentation\n\n## Error Handling:\n- If clip data is incomplete, specify what's missing\n- For invalid timecodes, request clarification\n- Don't assume missing values - ask for them\n\nAlways generate production-ready XML that imports cleanly into Premiere Pro without errors."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        16128,
+        -1312
+      ],
+      "id": "b1ed36c6-78e4-4d8b-9617-b5046aec65d0",
+      "name": "AI Agent",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "Claude Sonnet 4"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        16128,
+        -1056
+      ],
+      "id": "61880d39-4dda-405c-9819-bb5d62701dbf",
+      "name": "Anthropic Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.text;\n\nconst clean = raw\n  .replace(/^```bash/, \"\")\n  .replace(/^```/, \"\")\n  .replace(/```$/, \"\")\n  .trim();\n\nreturn [\n  {\n    json: {\n      command: clean\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        12384,
+        -1184
+      ],
+      "id": "88a36fea-0a78-4908-89f9-0021452badec",
+      "name": "Code10",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        12128,
+        -976
+      ],
+      "id": "0086b183-ec00-47df-8ad5-5f3ac4c90080",
+      "name": "Google Gemini Chat Model6",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const command = $input.first().json.command\n\nreturn [\n  {\n    json: {\n      command\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        12512,
+        -1184
+      ],
+      "id": "432198f6-73cd-4d77-9adb-61507da4b193",
+      "name": "Code11",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "command": "={{ $json.command }}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        12640,
+        -1184
+      ],
+      "id": "432e403f-9f40-408d-809a-20be5cbf1cba",
+      "name": "Execute Command2",
+      "retryOnFail": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create valid ffmpeg commands using the provided input {{ JSON.stringify($json.video,null,1) }}, use the FileName provided for creating the ffmpeg command. In the clip name too.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are a video editing agent responsible for generating valid ffmpeg commands to trim clips from source videos, based on a structured timeline input.\n\nYou receive:\n- A list of timeline entries. Each entry contains:\n  - id: numeric identifier for the clip\n  - video_file: the name of the source video filename\n  - start and end: timestamps in HH:MM:SS format\n  - description: a short description of the shot (context only — not used in commands)\n\n\n\n---\n\n### Your task:\nGenerate **one combined command string** that:\n- Includes a separate `ffmpeg` command for **each timeline entry**.\n- Chains all commands using `&&` (to run sequentially in a shell or script).\n- Ensures frame-accurate trimming by placing `-ss` **after** the input `-i` parameter, along with re-encoding (`-c:v libx264`).\n\nFor each entry:\n- Use `-ss [start]` placed **after** `-i`.\n- Calculate the clip's duration (`-t`) by subtracting the `start` timestamp from the `end` timestamp.\n- Use the encoding settings: `-c:v libx264 -preset veryfast -crf 18`.\n- Set audio encoding to: `-c:a aac -b:a 128k`.\n- Input file must always be: `\"D:\\n8n\\Europcar\\input\\filename\"`.\n- Output file must always be: `\"D:\\n8n\\Europcar\\clips\\clip_[id]_[filename].mp4\"`.\n\n---\n\n### Strict Rules:\n❗ Generate exactly one command per timeline entry, joined using `&&`.  \n❗ Correctly calculate and use the duration (`-t`) for each command.  \n❗ Do not use `-to`.  \n❗ Do not skip, merge, or invent clips—include every provided entry.  \n❗ Do not modify file paths or file naming conventions.  \n❗ Return **only** the final concatenated command string—no explanations, markdown, formatting, or extra text.\n\nYou must use the following hardcoded paths:\n- Input video: \"D:\\n8n\\Europcar\\input\\filename\"\n- Output directory: \"D:\\n8n\\Europcar\\clips\"\n### **Valid Example Output on 2 clips:**\n\nffmpeg -i \"D:\\n8n\\Europcar\\input\\filename\" -ss 00:00:50.120 -t 00:00:05.000 -c:v libx264 -preset veryfast -crf 18 -c:a aac -b:a 128k \"D:\\n8n\\Europcar\\clips\\clip_1_[filename].mp4\" && ffmpeg -i \"D:\\n8n\\Europcar\\input\\filename\" -ss 00:01:16.050 -t 00:00:03.000 -c:v libx264 -preset veryfast -crf 18 -c:a aac -b:a 128k \"D:\\n8n\\Europcar\\clips\\clip_2_[filename].mp4\"\n\n---\n\nreplace \"filename\" with the file name provided in the input json\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        12128,
+        -1184
+      ],
+      "id": "dfa73d80-0dbd-4b70-9fba-753158d4441d",
+      "name": "FFMPEG COMMAND MAKER1",
+      "retryOnFail": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        13168,
+        -960
+      ],
+      "id": "c1e1be95-66fb-45f7-b325-2b5d013db533",
+      "name": "Google Gemini Chat Model5",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create a new ffmpeg command to join the clips generated from this {{ $('Code11').item.json.command }} considering clip names in the order",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are a **Video Stitching Agent** responsible for generating a valid `ffmpeg` command to **stitch together multiple trimmed clips** into a single video. The input clips were trimmed by a prior agent and are stored in a known directory.\n\n### Input You Receive:\n\n* A list of **clip IDs**\n* All trimmed clips follow this pattern:\n\n  * Directory: `D:\\n8n\\Europcar\\clips\\`\n  * Filename: filename\n\n### Your Responsibilities:\n\n1. Generate an `ffmpeg` command that **concatenates the input clips in the given order**.\n2. Use the **concat demuxer method** (not the filtergraph).\n3. The command must:\n\n   * Create a temporary file list (e.g., `file_list.txt`) in the same output folder\n   * Write one line per file in the right order \n   * Use the concat demuxer to generate `final_output.mp4`\n\n### Hardcoded Paths:\n\n* **Clips directory**: `D:\\n8n\\Europcar\\clips\\`\n* **File list path**: `D:\\n8n\\Europcar\\clips\\file_list.txt`\n* **Final output video**: `D:\\n8n\\Europcar\\output\\final_output.mp4`\n\n### Constraints:\n\n* You must return **only the raw ffmpeg command(s)**, not explanations or markdown.\n* If needed, include a `echo` or `powershell`/`cmd` script segment to generate the file list.\n* The stitching assumes all clips were re-encoded identically (same codec and format), so they are safe to concatenate.\n\n---\n\n### Example Output):\n\n```bash\n(echo file 'clip_11.mp4' & echo file 'clip_16.mp4' & echo file 'clip_23.mp4') > \"D:\\n8n\\Europcar\\clips\\file_list.txt\" && ffmpeg -f concat -safe 0 -i \"D:\\n8n\\Europcar\\clips\\file_list.txt\" -c copy \"D:\\n8n\\Europcar\\output\\final_output.mp4\"\n```"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        13168,
+        -1184
+      ],
+      "id": "24b6fa27-8cc7-46a0-b8f5-55cd9f28f46b",
+      "name": "FFMPEG CONCAT1",
+      "retryOnFail": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75d2ce6e-55eb-4c4c-9296-bea7a9512598",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        13776,
+        -1184
+      ],
+      "id": "40478aa8-be18-4382-9dfd-a5a2eaa29b7a",
+      "name": "Edit Fields6",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.text;\n\nconst clean = raw\n  .replace(/^```bash/, \"\")\n  .replace(/^```/, \"\")\n  .replace(/```$/, \"\")\n  .trim();\n\nreturn [\n  {\n    json: {\n      command: clean\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        13904,
+        -1184
+      ],
+      "id": "8cd6654d-d757-4409-ab3a-b48a3c0bc8a0",
+      "name": "Code6",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const command = $input.first().json.command\n\nreturn [\n  {\n    json: {\n      command\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        14048,
+        -1184
+      ],
+      "id": "4abe235c-5285-4cd0-8417-af1cdb6e7a43",
+      "name": "Code9",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "files",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        10064,
+        -1344
+      ],
+      "id": "646a3ae4-fd66-473e-8db3-c6d539e428d9",
+      "name": "Split Out1",
+      "executeOnce": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        10224,
+        -1344
+      ],
+      "id": "25619093-abf2-480b-a975-d99522f03877",
+      "name": "Loop Over Items2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    clips: $items().map(item => item.json)\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        10544,
+        -1360
+      ],
+      "id": "02f8192a-2734-45ab-9133-3c3e0da3b1ee",
+      "name": "Code3",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1_nYjB2LdLlJE1kp2QrXDygYfaM8cCbyQUC1lUTVriMo",
+          "mode": "list",
+          "cachedResultName": "Europcar-Logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_nYjB2LdLlJE1kp2QrXDygYfaM8cCbyQUC1lUTVriMo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1975531313,
+          "mode": "list",
+          "cachedResultName": "Editor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FBMyq_aFeqgjrmDlvvTarn17Ce0uiygFDE151aF2908/edit#gid=1975531313"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "NAME": "={{ $('Read/Write Files from Disk').item.json.name }}",
+            "PATH": "={{ $('Read/Write Files from Disk').item.json.fileName }}",
+            "DESCRIPTION": "={{ $json.content.parts[0].text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "NAME",
+              "displayName": "NAME",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PATH",
+              "displayName": "PATH",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DESCRIPTION",
+              "displayName": "DESCRIPTION",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        10544,
+        -1072
+      ],
+      "id": "2527d735-8740-43c3-83e8-0bab8285eb7d",
+      "name": "Append row in sheet2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    files: $input.all().map(item => ({\n      id: item.json.id,\n      name: item.json.name\n    }))\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9920,
+        -1344
+      ],
+      "id": "fa226144-0029-4473-893e-f90e66d1b0a4",
+      "name": "Code4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        15120,
+        -1024
+      ],
+      "id": "716bf3c5-0a00-4139-9c19-9866cb22a02c",
+      "name": "Google Gemini Chat Model2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## XML MARKUP",
+        "height": 464,
+        "width": 784,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        16064,
+        -1392
+      ],
+      "id": "ef692300-b476-448a-9f72-5fc2dcdc2c41",
+      "name": "Sticky Note2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## VIDEO EDITOR",
+        "height": 880,
+        "width": 6288,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        9648,
+        -1440
+      ],
+      "id": "04dc3632-7cec-4446-a953-67d509ba33b7",
+      "name": "Sticky Note4",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        992,
+        -544
+      ],
+      "id": "70460672-b7cc-4453-9d80-ec00f796812a",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "['CD DELIVERABLES LIST'][0].DELIVERABLES",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -3504,
+        -80
+      ],
+      "id": "8d9c32ee-e697-42d6-81ed-8978534bb9a0",
+      "name": "Split Out3",
+      "executeOnce": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## ART DIRECTOR\n### Style Injection into the Scenes and Images the Creative Director came up with",
+        "height": 672,
+        "width": 784,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -5040,
+        768
+      ],
+      "id": "31cbf1a5-4b08-45e6-bb15-910a013fd36a",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## FILM DIRECTOR\n\n### Adding Cinematic Scene and Shot descriptions for the secenes the creative director came up with, camera movement with the style of client, amount of motion, panings, lens flares, etc.",
+        "height": 624,
+        "width": 752,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4832,
+        1824
+      ],
+      "id": "ee5205f3-e1c7-4c06-bf88-aa949167f524",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -4624,
+        1088
+      ],
+      "id": "cafc6ea9-b53c-4e8c-8ae5-068e6bb0dab6",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -4560,
+        2208
+      ],
+      "id": "df899c9b-3c83-42c0-bee9-5eca8be0fb65",
+      "name": "Google Gemini Chat Model7",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -4416,
+        2224
+      ],
+      "id": "d6c8a1f8-6e64-4909-946f-48d9a1c214b7",
+      "name": "Structured Output Parser3",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Adding Cinematic Scene and Shot descriptions for the secenes the creative director came up with, camera movement with the style of client, amount of motion, panings, lens flares, etc."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -4560,
+        1968
+      ],
+      "id": "0d95c9fa-dcd6-4033-b1d5-6cebb4905fba",
+      "name": "Film Creative Director",
+      "alwaysOutputData": false,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## WEBHOOK TRIGGER\n\n",
+        "height": 560,
+        "width": 2496,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -12912,
+        912
+      ],
+      "id": "c914a7c0-2051-44c5-a3d5-34f6ea45a6f7",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: Webhook gives 1 item with many binary keys (data0, data1, ...)\n// Output: One item per file, each with binary under \"data\"\nconst out = [];\n\nfor (const item of items) {\n  const bin = item.binary || {};\n  const keys = Object.keys(bin);\n  for (const k of keys) {\n    out.push({\n      json: {\n        originalKey: k,\n        fileName: bin[k].fileName,\n        mimeType: bin[k].mimeType,\n      },\n      binary: {\n        // IMPORTANT: the Google Drive node will read from \"data\"\n        data: bin[k],\n      },\n    });\n  }\n}\n\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -10192,
+        624
+      ],
+      "id": "4b9bbb84-79e2-4410-99f4-de64100b5740",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "trigger",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -12832,
+        1040
+      ],
+      "id": "34b080e1-b73a-46af-b0e5-7d58fac99518",
+      "name": "Webhook",
+      "webhookId": "110055e6-0518-4802-919a-e1d4c528198d"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"runId\": \"{{ $json.runId }}\",\n  \"resumeUrl\": \"{{ $json.resumeUrl }}\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -12496,
+        1040
+      ],
+      "id": "78f4e6bf-44f9-415f-b928-aa9d2a0f37e0",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c7bc4a03-b77c-4d06-b5e3-e7028d8de24f",
+              "name": "runId",
+              "value": "={{ $json.runId || $json.clientId || String(Date.now()) }}",
+              "type": "string"
+            },
+            {
+              "id": "25112949-7144-405a-84e8-9b887146685b",
+              "name": "resumeUrl",
+              "value": "={{ $execution.resumeUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -12672,
+        1040
+      ],
+      "id": "de133f8d-544a-4811-b0b9-5d48d45dd687",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -2224,
+        768
+      ],
+      "id": "ebef6985-77ed-4212-96af-c7bf63212118",
+      "name": "Wait2",
+      "webhookId": "bad30c77-31d5-41ce-83fc-1a16a81d9f91"
+    },
+    {
+      "parameters": {
+        "content": "# HITL",
+        "height": 400,
+        "width": 614,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2624,
+        656
+      ],
+      "id": "7e55df9e-7515-4997-bf8f-3af8b80e435d",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -10592,
+        1040
+      ],
+      "id": "391bdd98-afdb-4fdb-87dc-1f215d7a9f8a",
+      "name": "Wait",
+      "webhookId": "a4334e6c-96e3-4f7e-b8b3-e8dc8fd53151"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "Test01",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "12etOWeSNilrMC0nEf4wyAUp_vxWUON5j",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -10928,
+        1040
+      ],
+      "id": "89f9ccf2-2563-4618-a95f-b6d25a50db03",
+      "name": "Create folder",
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "QoL48MB8fYUTgoXh",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 6
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -9840,
+        624
+      ],
+      "id": "68903b76-9ca9-4be4-a796-98bad064ea3b",
+      "name": "Wait4",
+      "webhookId": "e74329c1-9ba2-4985-8aac-072e4dfa3e24"
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Code in JavaScript1').item.json.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create folder').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -9968,
+        624
+      ],
+      "id": "59b126bb-40bf-49d8-9b78-e5c8afed409a",
+      "name": "Upload file2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "QoL48MB8fYUTgoXh",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $('Create folder').item.json.id }}",
+            "mode": "id"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -9648,
+        624
+      ],
+      "id": "07273969-5db6-4c41-a0b0-9c6b80624867",
+      "name": "Search files and folders1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "QoL48MB8fYUTgoXh",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -9440,
+        624
+      ],
+      "id": "8e1fcc1e-047d-40e2-9da6-bafde4b8232d",
+      "name": "DOWNLOAD",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "QoL48MB8fYUTgoXh",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -11456,
+        1200
+      ],
+      "id": "3a23c5ea-d101-493b-8da4-4503b1c261b7",
+      "name": "Google Gemini Chat Model18",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=From the provided image descriptions reverse engineer the style to create a System Prompt for a Style Injection agent that can Inject the style, light, composition of the images to an Image Prompt. {{ JSON.stringify( $json.images, null, 1) }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a Style Prompt Generator Agent. Your task is to analyze a batch of images and reverse-engineer the dominant visual style to create a structured system prompt for a Style Injection Agent. This final system prompt should be a comprehensive guide for injecting the identified style into new image prompts.\n\nYour analysis must be meticulous and cover the following key areas:\n\nSubject Matter & Tone: Identify the primary subjects (e.g., people, objects, locations) and the overall mood, emotion, and narrative conveyed by the images. Note demographics, clothing, actions, and the general feeling.\n\nLighting & Color: Describe the type of lighting (e.g., natural, studio, time of day), its direction, and how it affects the scene. Analyze the dominant color palette, including a description of the temperature (warm/cool) and any specific effects like lens flares or soft glows.\n\nComposition & Framing: Detail the common camera angles, perspectives (e.g., close-up, wide shot), and the use of depth of field (shallow vs. deep focus). Note how subjects are framed and positioned within the scene. Look for recurring patterns in how elements are arranged.\n\nOverall Aesthetic: Synthesize your findings into a concise summary of the overall style. Use evocative and descriptive language to encapsulate the look and feel (e.g., \"cinematic and moody,\" \"bright and optimistic,\" \"professional and sleek\").\n\nInstructions for the Style Prompt Generator Agent:\n\nReceive a batch of images descriptions from the user.\n\nConduct a thorough analysis based on the four points above.\n\nDraft a new system prompt that starts with \"You are a Style Injection Agent...\"\n\nThe generated system prompt must include the following sections, using clear markdown headings:\n\nCore Elements of the Injected Style: This section should contain subsections for \"Subject Matter & Tone,\" \"Lighting & Color,\" and \"Composition & Framing,\" detailing your analysis.\n\nInstructions for the Style Injection Agent: Provide clear, actionable steps for the Injection Agent, instructing it to integrate the analyzed style elements into a new prompt. This section should also include a clear example of a before-and-after prompt to demonstrate the injection process.\n\nYour final output must be only the complete, ready-to-use system prompt for the Style Injection Agent. Do not include your analysis notes or any conversational preamble. The prompt should be self-contained and ready to be used as a new instruction set. \nOnly output the prompt in simple text format."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -11456,
+        1040
+      ],
+      "id": "fbcb969a-608a-4216-bf9d-a25c9ad5a981",
+      "name": "STYLE SYSTEM PROPMT AGENT1",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Analyze the images and give me a description, camera angle, style, color palette, mood, subjects, characters, objects.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -11840,
+        1040
+      ],
+      "id": "c24fe3f5-92ff-489a-bc0b-9db6d58aacc1",
+      "name": "Analyze image2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    images: $items().map(item => item.json)\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -11648,
+        1040
+      ],
+      "id": "b36b5582-300f-4f91-95ca-49f72c786dab",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -12288,
+        1040
+      ],
+      "id": "e6a234d7-2f28-4781-9020-1e2ff1ac2bbf",
+      "name": "Wait7",
+      "webhookId": "db452569-f88e-408c-a5f7-45df1a9c40f4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: Webhook gives 1 item with many binary keys (data0, data1, ...)\n// Output: One item per file, each with binary under \"data\"\nconst out = [];\n\nfor (const item of items) {\n  const bin = item.binary || {};\n  const keys = Object.keys(bin);\n  for (const k of keys) {\n    out.push({\n      json: {\n        originalKey: k,\n        fileName: bin[k].fileName,\n        mimeType: bin[k].mimeType,\n      },\n      binary: {\n        // IMPORTANT: the Google Drive node will read from \"data\"\n        data: bin[k],\n      },\n    });\n  }\n}\n\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -12048,
+        1040
+      ],
+      "id": "2973fa1e-d36d-4d7c-bcae-15e9e38e615a",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"ok\": true,\n  \"resumeUrl\": \"{{$execution.resumeUrl}}\"\n}\n",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -10720,
+        1040
+      ],
+      "id": "4dd075b1-95fe-42b8-9860-e0dd0379a45f",
+      "name": "Respond to Webhook3"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "=[\n  {\n    \"ok\": true,\n    \"resumeUrl\": \"{{$execution.resumeUrl}}\",\n    \"images\": {{ JSON.stringify($json.images) }},\n    \"message\": \"{{$json.message}}\"\n  }\n]\n",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -240,
+        240
+      ],
+      "id": "23049bbe-98c2-4bd2-89e1-ed151085f744",
+      "name": "Respond to Webhook4"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "=[\n  {\n  \"ok\": true,\n  \"resumeUrl\": \"{{$execution.resumeUrl}}\",\n  \"DELIVERABLES\":\n    {{ JSON.stringify($json.DELIVERABLES,null, 1) }}\n  }\n]",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -2448,
+        768
+      ],
+      "id": "018491e4-4de6-4011-9a32-431c8c6e3622",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Modify the provided JSON input following your system instructions. {{ JSON.stringify($('Creative Director').item.json.output, null, 1) }}, inject the style but do not modify the JSON File format. Only Output a JSON Back with the necessary information for creative image generation",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "={{ $json.stylePrompt }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -4608,
+        912
+      ],
+      "id": "56b4a6ba-677b-4a30-89d6-0880254a2cba",
+      "name": "Art Director",
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1_nYjB2LdLlJE1kp2QrXDygYfaM8cCbyQUC1lUTVriMo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "IMAGES",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_nYjB2LdLlJE1kp2QrXDygYfaM8cCbyQUC1lUTVriMo/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "pupi",
+            "PROMPT": "pupi",
+            "GET": "pupi"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PROMPT",
+              "displayName": "PROMPT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GET",
+              "displayName": "GET",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -2960,
+        192
+      ],
+      "id": "ca9083f9-a9fb-4512-89eb-a0b4d80fb454",
+      "name": "Append row in sheet3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "B5OyxSxpvH2s2kHU",
+          "name": "Google Sheets account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Split Out').item.json['Deliverable ID'] }}_{{ $binary.data.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "=1K63g72Tw20ZzrR6Jr3rF8ju3vMzJQYUA",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        512,
+        912
+      ],
+      "id": "49230410-8f88-4b34-b763-1f1d53b78b3e",
+      "name": "UPLOADIMAGE",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "QoL48MB8fYUTgoXh",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "=https://docs.google.com/spreadsheets/d/1_nYjB2LdLlJE1kp2QrXDygYfaM8cCbyQUC1lUTVriMo/edit?gid=1579705064#gid=1579705064",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1579705064,
+          "mode": "list",
+          "cachedResultName": "Style-Prompt",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_nYjB2LdLlJE1kp2QrXDygYfaM8cCbyQUC1lUTVriMo/edit#gid=1579705064"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -2960,
+        0
+      ],
+      "id": "7899308e-7e50-405d-a5b5-bf0bb354958a",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "B5OyxSxpvH2s2kHU",
+          "name": "Google Sheets account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get input as an array of objects, whether it arrived as one array item or many items\nconst inputObjects = items.flatMap(item =>\n  Array.isArray(item.json) ? item.json : [item.json]\n);\n\n// Extract image URLs\nconst urls = [];\nfor (const obj of inputObjects) {\n  if (obj && Array.isArray(obj.images)) {\n    for (const img of obj.images) {\n      if (img && img.url) urls.push(img.url);\n    }\n  }\n}\n\n// Build output\nconst output = {\n  ok: true,\n  // Keep this as a literal expression string if you want it evaluated later in other n8n nodes\n  resumeUrl: '{{$execution.resumeUrl}}',\n  images: urls,\n  message: `Generated ${urls.length} image${urls.length === 1 ? '' : 's'}`\n};\n\n// Return as a single item\nreturn [{ json: output }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -544,
+        240
+      ],
+      "id": "5d70cece-242f-4152-8c55-eee7fba92eff",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "edit",
+        "prompt": "={{ $('Loop Over Items4').item.json.feedback }}",
+        "images": {
+          "values": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        3056,
+        288
+      ],
+      "id": "0eccaff0-e6e4-40b1-b4d6-8062cbc331b3",
+      "name": "Edit an image",
+      "alwaysOutputData": false,
+      "executeOnce": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        288
+      ],
+      "id": "4d17b4ec-fb85-4f6a-aacd-1bc2fc0fcdea",
+      "name": "Google Gemini Chat Model12",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "# NANO BANANA",
+        "height": 512,
+        "width": 2608
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        352,
+        -48
+      ],
+      "id": "0e01a55f-79ce-4862-abe0-087af30d2046",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create a prompt for image generation for {{ $json[\"Scene description\"] }} \nDO NOT USE \"\"\nALWAYS INCLUDE \"GOOGLE PIXEL PRO 10\" in the prompt\nALWAYS INCLUDE \"Based on the provided images generate \"",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        1184,
+        80
+      ],
+      "id": "f40cd5d0-35b0-41f2-9f9f-9707f3a08ad2",
+      "name": "BANANA ENGINEER",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        848,
+        64
+      ],
+      "id": "cde958ac-c6b3-4e6e-bcb3-3cbc038fcdee",
+      "name": "Loop Over Items4"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Loop Over Items4').item.json.image }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1504,
+        80
+      ],
+      "id": "698a09c8-923c-420c-b433-77a05387c180",
+      "name": "GETBINRAYIMAGE1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "p1gpknzP0ASSuB4x",
+          "name": "FAL-PIXEL-API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2160,
+        -432
+      ],
+      "id": "46a7b7c0-a19f-44a5-a498-4a7ba639f0fb",
+      "name": "Wait8",
+      "webhookId": "d5d93b0f-df4d-4001-b905-ddabdee9b654"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "=[\n  {\n    \"ok\": true,\n    \"resumeUrl\": \"{{$execution.resumeUrl}}\",\n    \"images\": {{ JSON.stringify($json.images) }},\n    \"message\": \"{{$json.message}}\",\n    \"status\": \"done\"\n  }\n]\n",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1920,
+        -432
+      ],
+      "id": "4e8bb983-2e37-4e6f-b4fd-e4ff97bcd51f",
+      "name": "Respond to Webhook5"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get input as an array of objects, whether it arrived as one array item or many items\nconst inputObjects = items.flatMap(item =>\n  Array.isArray(item.json) ? item.json : [item.json]\n);\n\n// Extract image URLs\nconst urls = [];\nfor (const obj of inputObjects) {\n  if (obj && Array.isArray(obj.images)) {\n    for (const img of obj.images) {\n      if (img && img.url) urls.push(img.url);\n    }\n  }\n}\n\n// Build output\nconst output = {\n  ok: true,\n  // Keep this as a literal expression string if you want it evaluated later in other n8n nodes\n  resumeUrl: '{{$execution.resumeUrl}}',\n  images: urls,\n  message: `Generated ${urls.length} image${urls.length === 1 ? '' : 's'}`\n};\n\n// Return as a single item\nreturn [{ json: output }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1424,
+        -64
+      ],
+      "id": "3947e6fd-d2e2-4148-9a96-dbc1a997cb95",
+      "name": "Code in JavaScript5",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        -208
+      ],
+      "id": "c59581f7-9bc8-493e-aede-83988bf1dd7e",
+      "name": "Google Gemini Chat Model13",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"DELIVERABLES\": {\n      \"type\": \"array\",\n      \"minItems\": 1,\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"Deliverable ID\": {\n            \"type\": \"string\",\n            \"minLength\": 1\n            \n          },\n          \"Scene description\": {\n            \"type\": \"string\",\n            \"minLength\": 1,\n            \"description\": \"Cinematic, frame-level description derived from Creative elements, Visual Style, Seasonality, Color Palette, Brand essence; must honor Avoid and Legal guardrails\"\n          },\n          \"Camera Movements\": {\n            \"type\": \"string\",\n            \"minLength\": 1,\n            \"description\": \"Concise motion path or 'Static' if none\"\n          },\n          \"Lighting & Mood\": {\n            \"type\": \"string\",\n            \"minLength\": 1,\n            \"description\": \"Atmosphere and tonal direction\"\n          }\n        },\n        \n        \"required\": [\"Deliverable ID\", \"Scene description\", \"Camera Movements\", \"Lighting & Mood\"],\n        \"additionalProperties\": false\n      }\n    }\n  },\n  \"required\": [\"DELIVERABLES\"],\n  \"additionalProperties\": false\n}\n",
+        "autoFix": true,
+        "customizeRetryPrompt": true,
+        "prompt": "You repair JSON to match a strict schema.\n\nGoal\n- Produce exactly ONE JSON object with a single top-level key \"DELIVERABLES\".\n- Each item must contain ONLY these keys:\n  - \"Deliverable ID\" (string, non-empty)\n  - \"Scene description\" (string, non-empty)\n  - \"Camera Movements\" (string, non-empty; if missing, set to \"Static\")\n- Remove any extra keys and any markdown/code fences.\n- Preserve original item order and IDs. Do not invent or duplicate items.\n\nKey normalization\n- Rename common aliases:\n  - \"Shot description\" → \"Scene description\"\n  - \"Scene Description\" / \"scene description\" → \"Scene description\"\n  - \"Camera Movement\" / \"camera movement(s)\" → \"Camera Movements\"\n\nIf an item is missing \"Deliverable ID\" or \"Scene description\", drop that item (do not invent content).\n\nINSTRUCTIONS (schema):\n{instructions}\n\nORIGINAL COMPLETION:\n{completion}\n\nVALIDATION ERROR:\n{error}\n\nReturn only the fixed JSON object. No prose, no markdown, no code fences.\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1584,
+        -208
+      ],
+      "id": "651ccc18-866f-4487-863c-6b5ad5a7c871",
+      "name": "Structured Output Parser5"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1568,
+        -80
+      ],
+      "id": "900c04ed-080c-4799-9436-d4a3dec7b18d",
+      "name": "Google Gemini Chat Model19",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Modify the image descriptions on the provided JSON input following your system instructions. {{ JSON.stringify($('Creative Director').item.json.output.DELIVERABLES, null, 1) }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "={{ $json.PROMPT }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -1696,
+        -384
+      ],
+      "id": "5b3a2fe2-4894-4dd7-8fa4-786eb0849cb2",
+      "name": "Art Director1",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "=1_nYjB2LdLlJE1kp2QrXDygYfaM8cCbyQUC1lUTVriMo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1579705064,
+          "mode": "list",
+          "cachedResultName": "Style-Prompt",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_nYjB2LdLlJE1kp2QrXDygYfaM8cCbyQUC1lUTVriMo/edit#gid=1579705064"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -2208,
+        -384
+      ],
+      "id": "c999bf1f-8668-4b29-a6c2-9118652fa71e",
+      "name": "Get row(s) in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "B5OyxSxpvH2s2kHU",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "    const allItems = $input.all();\n    let lastRow = null;\n    let maxRowNumber = -1;\n\n    for (const item of allItems) {\n      if (item.json && item.json.row_number !== undefined) {\n        const currentRowNumber = item.json.row_number;\n        if (currentRowNumber > maxRowNumber) {\n          maxRowNumber = currentRowNumber;\n          lastRow = item;\n        }\n      }\n    }\n\n    return lastRow ? [lastRow] : [];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1968,
+        -384
+      ],
+      "id": "5016f31d-d541-4389-851a-ca7829959ecc",
+      "name": "Code in JavaScript6"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2160,
+        80
+      ],
+      "id": "a34125eb-4717-421f-9e41-97ee41aa272d",
+      "name": "Wait9",
+      "webhookId": "f7c65da0-ea17-4164-bcb5-9156b9e490b7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://queue.fal.run/fal-ai/nano-banana/edit",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"prompt\": \"{{ $('GETBINRAYIMAGE1').item.json.feedback }}\",\n\"image_urls\": [\n       \"{{ $json.base64uri }}\"\n     ]\n}",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1936,
+        80
+      ],
+      "id": "cb346271-46b1-4938-9310-471f7d24f8a9",
+      "name": "ImageGen4-FAL",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "p1gpknzP0ASSuB4x",
+          "name": "FAL-PIXEL-API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.response_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2816,
+        64
+      ],
+      "id": "57fe7367-4800-4d8d-a292-23638f72f319",
+      "name": "GET-ImageGen4-FAL",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "p1gpknzP0ASSuB4x",
+          "name": "FAL-PIXEL-API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f5ee4b9f-d171-411f-a793-11a27591ed08",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "COMPLETED",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2528,
+        80
+      ],
+      "id": "24b525bd-2110-4149-ad92-b56504f38d4a",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.status_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2320,
+        80
+      ],
+      "id": "c57d4a2a-2965-4bd8-94d8-c5f2be4fa279",
+      "name": "GET-ImageGen4-FAL3",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "p1gpknzP0ASSuB4x",
+          "name": "FAL-PIXEL-API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// assuming the binary property is named “data” (or whatever your node stores it as)\nconst field = 'data';  // or the actual binary field name\nconst buf = await this.helpers.getBinaryDataBuffer(0, field);\nconst meta = $binary[field];\nconst b64 = buf.toString('base64');\nconst uri = `data:${meta.mimeType};base64,${b64}`;\n\nreturn [{\n  json: {\n    base64uri: uri,\n    fileName: meta.fileName,\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1728,
+        80
+      ],
+      "id": "b8a975ea-8c2a-4a87-b710-e546a0bd7d06",
+      "name": "Code in JavaScript7"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get input as an array of objects, whether it arrived as one array item or many items\nconst inputObjects = items.flatMap(item =>\n  Array.isArray(item.json) ? item.json : [item.json]\n);\n\n// Extract image URLs\nconst urls = [];\nfor (const obj of inputObjects) {\n  if (obj && Array.isArray(obj.images)) {\n    for (const img of obj.images) {\n      if (img && img.url) urls.push(img.url);\n    }\n  }\n}\n\n// Build output\nconst output = {\n  ok: true,\n  // Keep this as a literal expression string if you want it evaluated later in other n8n nodes\n  resumeUrl: '{{$execution.resumeUrl}}',\n  images: urls,\n  message: `Fixed ${urls.length} image${urls.length === 1 ? '' : 's'}`\n};\n\n// Return as a single item\nreturn [{ json: output }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1728,
+        -432
+      ],
+      "id": "2b97d812-a479-48bd-94f2-b7751466c122",
+      "name": "Code in JavaScript8"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body[0].selections",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        608,
+        112
+      ],
+      "id": "77162809-f0bd-4084-bf43-e499700eaf1f",
+      "name": "Split Out4"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        4096,
+        -608
+      ],
+      "id": "209ff2e1-a9bf-4bd0-8b39-63bcf9b51594",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "name": "=Google_Pixel_10_{{ $binary.da.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1amy8TfDvh3-OS5moApq4yq9yuejOO3kH",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3760,
+        -512
+      ],
+      "id": "5ce1e3e5-492f-43d9-b127-1e2614c835d0",
+      "name": "UPLOADIMAGE1",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "QoL48MB8fYUTgoXh",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        5360,
+        -608
+      ],
+      "id": "77b69169-e2a4-4565-ab03-0d30a1c732e2",
+      "name": "Wait11",
+      "webhookId": "dbf81092-23d0-453f-adff-28c4b7b033bd"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://queue.fal.run/fal-ai/wan-25-preview/image-to-video",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n     \"prompt\": \"{{ $json.output }}\",\n     \"image_url\": \"{{ $('Edit Fields3').item.json.base64uri }}\"\n   }",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5088,
+        -624
+      ],
+      "id": "f8b7640e-df00-4d28-afe7-2fa556c4aeac",
+      "name": "VEO1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "p1gpknzP0ASSuB4x",
+          "name": "FAL-PIXEL-API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.status_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "f22e9626-845e-4aa9-9ce5-864d1490678d",
+      "name": "STATUS",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        5584,
+        -608
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "p1gpknzP0ASSuB4x",
+          "name": "FAL-PIXEL-API"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.response_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "a1c57f15-4e04-4392-b0db-5296c5d30952",
+      "name": "GETVIDEO",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        6080,
+        -640
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "p1gpknzP0ASSuB4x",
+          "name": "FAL-PIXEL-API"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.video.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6320,
+        -656
+      ],
+      "id": "f96b66e1-5649-4172-8135-74dbdb928b21",
+      "name": "GETBINRAYIMAGE8",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "p1gpknzP0ASSuB4x",
+          "name": "FAL-PIXEL-API"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        4544,
+        -464
+      ],
+      "id": "726b4bf8-cc98-4d7e-81ec-e7adc1ca991a",
+      "name": "Google Gemini Chat Model20",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e357019e-ca38-4eea-a97b-3131247017d5",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4864,
+        -624
+      ],
+      "id": "1cdbe2bc-bf2c-4619-ae6a-ce6f1bb55c6d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create a video prompt from this Image analysis description {{ $('Merge1').item.json.content.parts[0].text }}, with this user guide prompt {{ $('Loop Over Items5').item.json.feedback }}\n\nDO NOT USE \"\" on the Prompt\nONLY OUTPUT THE PROMPT",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a helpful creative assistant specializing in transforming scene descriptions into fully formed, descriptive video prompts tailored for Google Veo Video generation, with a focus on Motion, Animation, Sound effects and Camera Motions.\nFocus on the motion aspect of the prompt, not the style, elements or effects.\nJust output the prompt, no extra information or text.\nFocus on the motion, camera movements.\nDo not include any \\n\\n on the output, only plain text.\nAvoid Image quality modifiers: high-quality, beautiful, 4K, HDR, professional studio photo.\n\n\n**IMPORTANT**\nDO NOT OUTPUT A JSON, ONLY A PROMPT\nAVOID SPECIFIC CAR BRANDS LOGOS\nDO NOT USE CAR BRANDS IN THE PROMPTS\nLESS THAN 1000 CHARACTERS\nAVOID SNOW, WINTER and COLD\nTAKE INTO ACCOUNT THE \"CAMERA MOVEMENTS\" descriptions on the user prompt when creating the Video Prompt.\nKEEP THE PROMPT UNDER 800 CHARACTERS"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        4544,
+        -624
+      ],
+      "id": "1d358260-2654-47a6-b64d-7294e17b6e87",
+      "name": "Prompt Engineer Videos",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Analize the imagen in detail, camera angle, style, time of day, objects within the scene, with cinematic precision, less than 100 Words.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        3760,
+        -688
+      ],
+      "id": "5f6e2dd8-f2cc-4284-b130-623b9fb2fa32",
+      "name": "Analyze image3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// assuming the binary property is named “data” (or whatever your node stores it as)\nconst field = 'data';  // or the actual binary field name\nconst buf = await this.helpers.getBinaryDataBuffer(0, field);\nconst meta = $binary[field];\nconst b64 = buf.toString('base64');\nconst uri = `data:${meta.mimeType};base64,${b64}`;\n\nreturn [{\n  json: {\n    base64uri: uri,\n    fileName: meta.fileName,\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3760,
+        -368
+      ],
+      "id": "47e5c0e4-d7a5-433f-9800-68c462472ace",
+      "name": "Code in JavaScript9"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f5ee4b9f-d171-411f-a793-11a27591ed08",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "COMPLETED",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5840,
+        -624
+      ],
+      "id": "76364159-d17a-4988-9e0c-34df94c5e80d",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "content": "# VIDEO",
+        "height": 576,
+        "width": 2992,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3472,
+        -768
+      ],
+      "id": "2f5c782d-516c-488d-8505-e1933596f335",
+      "name": "Sticky Note19"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ec17da95-6714-4d53-a835-da8e0c04b20f",
+              "name": "base64uri",
+              "value": "={{ $json.base64uri }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4288,
+        -608
+      ],
+      "id": "323c2e04-6f1f-45ff-a885-b157fbf18016",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.image }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3344,
+        -416
+      ],
+      "id": "2a374c6d-117c-4663-add3-1d250b6d5e6c",
+      "name": "GETBINRAYIMAGE2",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "p1gpknzP0ASSuB4x",
+          "name": "FAL-PIXEL-API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body[0].selections",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2416,
+        -432
+      ],
+      "id": "ba3ab559-5214-4864-8337-3af9e4e3472e",
+      "name": "Split Out5"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        992,
+        -752
+      ],
+      "id": "146e93e3-7be4-4c84-bd84-1e36d2a863a1",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4352,
+        -1024
+      ],
+      "id": "d5e84565-3c81-493e-913d-7284c42b7264",
+      "name": "Wait12",
+      "webhookId": "a2cd0f5f-6686-4907-949e-db9bc4ba25e0"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "=[\n  {\n    \"ok\": true,\n    \"resumeUrl\": \"{{$execution.resumeUrl}}\",\n    \"videos\": {{ JSON.stringify($json.videos) }},\n    \"message\": \"{{$json.message}}\",\n    \"status\": \"done\"\n  }\n]\n",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        4112,
+        -1024
+      ],
+      "id": "f383d769-a23b-4767-97fd-6c463768669b",
+      "name": "Respond to Webhook6"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect input items (flatten in case array of arrays)\nconst inputObjects = items.flatMap(item =>\n  Array.isArray(item.json) ? item.json : [item.json]\n);\n\n// Extract video URLs\nconst urls = [];\nfor (const obj of inputObjects) {\n  if (obj && obj.video && obj.video.url) {\n    urls.push(obj.video.url);\n  }\n}\n\n// Build output\nconst output = {\n  ok: true,\n  resumeUrl: '{{$execution.resumeUrl}}',\n  videos: urls,\n  message: `Generated ${urls.length} video${urls.length === 1 ? '' : 's'}`\n};\n\n// Return as a single item\nreturn [{ json: output }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3776,
+        -1024
+      ],
+      "id": "7ca54047-a8ef-403b-a3d7-2f321bd8de10",
+      "name": "Code in JavaScript10"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2768,
+        -432
+      ],
+      "id": "7913e142-c761-4d58-91cb-492a0df884e9",
+      "name": "Loop Over Items5"
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Analyze and transcribe the document in detail, focus on getting the exact brand design y guidelines from it",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -9024,
+        208
+      ],
+      "id": "041b81ca-4c6d-4e24-ad46-f1ac6fb72e41",
+      "name": "Analyze document",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2000,
+        1216
+      ],
+      "id": "ea5bb55d-dfa2-4d43-8895-8354fbb787bb",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You will recieve the output of a Creative Director agent step, please modify it's content to fit the Brand Guidelines from your System Message instructions, organize the data to fit the requested JSON format.\n\nYour output should be a perfect json in this exact format for each deliverable:\n{\n  \"DELIVERABLES\": [\n    {\n      \"Deliverable ID\": \"1\",\n      \"Scene description\": \"[Detailed visual description of scene composition, subject matter, environment, color palette, and aesthetic style]\",\n      \"Camera Movements\": \"[Description of camera motion type, speed, direction, and cinematographic intent]\",\n      \"Lighting & Mood\": \"[Lighting setup details, quality, direction, and overall emotional atmosphere]\"\n    },\n    {\n      \"Deliverable ID\": \"2\",\n      \"Scene description\": \"[Detailed visual description of scene composition, subject matter, environment, color palette, and aesthetic style]\",\n      \"Camera Movements\": \"[Description of camera motion type, speed, direction, and cinematographic intent]\",\n      \"Lighting & Mood\": \"[Lighting setup details, quality, direction, and overall emotional atmosphere]\"\n    },\n    {\n      \"Deliverable ID\": \"3\",\n      \"Scene description\": \"[Detailed visual description of scene composition, subject matter, environment, color palette, and aesthetic style]\",\n      \"Camera Movements\": \"[Description of camera motion type, speed, direction, and cinematographic intent]\",\n      \"Lighting & Mood\": \"[Lighting setup details, quality, direction, and overall emotional atmosphere]\"\n    }\n  ]\n}\n\nONLY OUTPUT  A JSON\nYOU ONLY OUTPUT A JSON WITH THE DELIVERABLES\n\nInput:\n{{ JSON.stringify($json.output, null, 1) }}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "={{ $json.content.parts[0].text }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -3728,
+        592
+      ],
+      "id": "c26714fc-0b8a-4d9c-8dd5-27b90edb7006",
+      "name": "BRANDAGENT",
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -3744,
+        800
+      ],
+      "id": "8eff5244-b738-4ba9-b768-9f19677418ae",
+      "name": "Google Gemini Chat Model9",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## BRAND AGENT\n",
+        "height": 736,
+        "width": 1056,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4080,
+        464
+      ],
+      "id": "931a39b8-cbf4-45fa-9e83-d85d70492fa3",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -3984,
+        592
+      ],
+      "id": "48db2e7d-b918-4c42-816b-176c6e1ee3fe",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "=1SS8MyiZzocH3p5FcFYgGl6YTa8o5LrP2mijeZn1Q2EI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SS8MyiZzocH3p5FcFYgGl6YTa8o5LrP2mijeZn1Q2EI/edit#gid=0"
+        },
+        "combineFilters": "OR",
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRange",
+              "headerRow": 2
+            }
+          },
+          "returnFirstMatch": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -4992,
+        912
+      ],
+      "id": "f2d5fca4-54a4-452d-b3a4-4267e6e1f0a3",
+      "name": "GETSTYLEROW1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "B5OyxSxpvH2s2kHU",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1SS8MyiZzocH3p5FcFYgGl6YTa8o5LrP2mijeZn1Q2EI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SS8MyiZzocH3p5FcFYgGl6YTa8o5LrP2mijeZn1Q2EI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": 2,
+            "Hola": "={{ $json.output}}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Hola",
+              "displayName": "Hola",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -11120,
+        1040
+      ],
+      "id": "dd862a2d-5a45-44f8-bb59-e0acdb77afe3",
+      "name": "APPENDSTYLEPROMPT1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "B5OyxSxpvH2s2kHU",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Access whatever the sheet returned\n// It’s usually stored in $json or $json[\"value\"] depending on node version\nconst value = Object.values($json)[1];  // gets the first value (the cell content)\n\n// Wrap it with a key you choose\nreturn [\n  {\n    json: {\n      stylePrompt: value\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4832,
+        912
+      ],
+      "id": "23fa5bed-4056-4e5a-b25b-ebb9f3908223",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Analyze the provided document and create a System Prompt for an LLM to act as a Brand/Tooklit Agent, and make a Brad Acurate and In Brand QA check on information that it receives",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -9024,
+        16
+      ],
+      "id": "025cb2f8-dca8-4463-a0c7-30528ea33383",
+      "name": "Analyze document1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"required\": [\"DELIVERABLES\"],\n  \"properties\": {\n    \"DELIVERABLES\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"required\": [\n          \"Deliverable ID\",\n          \"Scene description\",\n          \"Camera Movements\",\n          \"Lighting & Mood\"\n        ],\n        \"properties\": {\n          \"Deliverable ID\": {\n            \"type\": \"string\",\n            \"description\": \"Unique identifier for the deliverable\"\n          },\n          \"Scene description\": {\n            \"type\": \"string\",\n            \"description\": \"Detailed description of the scene including environment, colors, textures, and props\"\n          },\n          \"Camera Movements\": {\n            \"type\": \"string\",\n            \"description\": \"Description of camera angles, movements, focus, and depth of field\"\n          },\n          \"Lighting & Mood\": {\n            \"type\": \"string\",\n            \"description\": \"Description of lighting setup and emotional tone of the scene\"\n          }\n        },\n        \"additionalProperties\": false\n      }\n    }\n  },\n  \"additionalProperties\": false\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -3584,
+        816
+      ],
+      "id": "0844c552-fd3a-4c8f-822e-999f1bfe99cc",
+      "name": "Structured Output Parser6",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -3584,
+        976
+      ],
+      "id": "bdd7ef57-5510-4a1b-b4ae-9e192ec43d66",
+      "name": "Google Gemini Chat Model17",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "stEau6R0NyjmKiSP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -4352,
+        208
+      ],
+      "id": "ff945feb-a9d4-4d35-bb60-27e8955f0601",
+      "name": "Schedule Trigger2"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"DELIVERABLES\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"Deliverable ID\": {\n            \"type\": \"string\",\n            \"description\": \"Unique identifier for the deliverable\"\n          },\n          \"Scene description\": {\n            \"type\": \"string\",\n            \"description\": \"Detailed visual description of the scene including composition, subject matter, technical details, and aesthetic direction\"\n          },\n          \"Camera Movements\": {\n            \"type\": \"string\",\n            \"description\": \"Description of camera motion, movement type, and cinematographic approach\"\n          },\n          \"Lighting & Mood\": {\n            \"type\": \"string\",\n            \"description\": \"Lighting setup, quality, and overall emotional tone of the scene\"\n          }\n        },\n        \"required\": [\n          \"Deliverable ID\",\n          \"Scene description\",\n          \"Camera Movements\",\n          \"Lighting & Mood\"\n        ],\n        \"additionalProperties\": false\n      },\n      \"minItems\": 1\n    }\n  },\n  \"required\": [\"DELIVERABLES\"],\n  \"additionalProperties\": false\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -4448,
+        1184
+      ],
+      "id": "a4d87b25-6baf-4c8b-9dfa-bd7f8b332ce0",
+      "name": "Structured Output Parser7"
+    },
+    {
+      "parameters": {
+        "jsCode": "// N8N JavaScript Code Node - Clean LLM JSON Output\n\n// Get input items from N8N\nconst items = $input.all();\n\n// Process each item\nconst outputItems = items.map((item, index) => {\n  try {\n    let text = item.json.output || item.json;\n    \n    // Handle if text is object, convert to string\n    if (typeof text === 'object') {\n      text = JSON.stringify(text);\n    }\n    \n    // Remove markdown code fences\n    text = text.replace(/^```[\\w]*\\n?/gm, '').replace(/\\n?```$/gm, '');\n    \n    // Trim whitespace\n    text = text.trim();\n    \n    // Parse JSON\n    const parsed = JSON.parse(text);\n    \n    // Return cleaned data in N8N format\n    return {\n      json: parsed,\n      pairedItem: { item: index }\n    };\n    \n  } catch (error) {\n    // Return error info for debugging\n    return {\n      json: {\n        error: error.message,\n        originalData: item.json,\n        index: index\n      },\n      pairedItem: { item: index }\n    };\n  }\n});\n\nreturn outputItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3376,
+        592
+      ],
+      "id": "edf115d1-0611-469c-891d-271fabc59e7c",
+      "name": "Code in JavaScript11"
+    }
+  ],
+  "pinData": {
+    "When clicking ‘Execute workflow’": [
+      {
+        "json": {
+          "image": "https://v3.fal.media/files/kangaroo/hsppIMTBiUwsoIkgu6rXq_output.png",
+          "feedback": "Change the truck to a red truck",
+          "index": 0
+        }
+      },
+      {
+        "json": {
+          "image": "https://v3.fal.media/files/panda/j1w6B4dO33uZLPAhg09jF_output.png",
+          "feedback": "put a UFO on the sky",
+          "index": 1
+        }
+      },
+      {
+        "json": {
+          "image": "https://v3b.fal.media/files/b/penguin/j4gPr0ZgIZUvkKVLyRKzk_output.png",
+          "feedback": "Turn off the lights",
+          "index": 2
+        }
+      }
+    ],
+    "Schedule Trigger": [
+      {
+        "json": {
+          "video": {
+            "url": "https://v3b.fal.media/files/b/zebra/8Gyt_DwwtukUYh51Dt_E4_output.mp4",
+            "content_type": "video/mp4",
+            "file_name": "output.mp4",
+            "file_size": 3213803
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model8": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Prompt Engineer Stills2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt Engineer Stills2": {
+      "main": [
+        [
+          {
+            "node": "ImageGen4-FAL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prompt Engineer Stills2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait6": {
+      "main": [
+        [
+          {
+            "node": "GET-ImageGen4-FAL2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ImageGen4-FAL1": {
+      "main": [
+        [
+          {
+            "node": "Wait6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET-ImageGen4-FAL1": {
+      "main": [
+        [
+          {
+            "node": "GETBINRAYIMAGE",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET-ImageGen4-FAL2": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "GET-ImageGen4-FAL1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GETBINRAYIMAGE": {
+      "main": [
+        [
+          {
+            "node": "UPLOADIMAGE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brief ingest": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields16",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Summarize1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        []
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "USER PROMPT": {
+      "main": [
+        [
+          {
+            "node": "Code13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Debriefer1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model10": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Debriefer1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields10": {
+      "main": [
+        [
+          {
+            "node": "Wait10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Debriefer1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model15": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Brief ingest",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields16": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Extract from File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait10": {
+      "main": [
+        [
+          {
+            "node": "Creative Director",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model16": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "USER PROMPT",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields17": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Creative Director",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Creative Director": {
+      "main": [
+        [
+          {
+            "node": "GETSTYLEROW1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        []
+      ]
+    },
+    "Code13": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields17",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model11": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Analyze video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze video": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OFFLINE EDITOR": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "OFFLINE EDITOR",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "OFFLINE EDITOR",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command1": {
+      "main": [
+        [
+          {
+            "node": "FFmpeg Clip JSON Parser Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code7": {
+      "main": [
+        [
+          {
+            "node": "FFMPEG COMMAND MAKER1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Code8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "FFmpeg Clip JSON Parser Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FFmpeg Clip JSON Parser Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code8": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code10": {
+      "main": [
+        [
+          {
+            "node": "Code11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "FFMPEG COMMAND MAKER1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code11": {
+      "main": [
+        [
+          {
+            "node": "Execute Command2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command2": {
+      "main": [
+        [
+          {
+            "node": "FFMPEG CONCAT1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FFMPEG COMMAND MAKER1": {
+      "main": [
+        [
+          {
+            "node": "Code10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "FFMPEG CONCAT1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FFMPEG CONCAT1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields6": {
+      "main": [
+        [
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "Code9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code9": {
+      "main": [
+        [
+          {
+            "node": "Execute Command1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "OFFLINE EDITOR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "FFmpeg Clip JSON Parser Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Art Director",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model7": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Film Creative Director",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Film Creative Director",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Analyze document",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Analyze document1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "Wait7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "USER PROMPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file2": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders1": {
+      "main": [
+        [
+          {
+            "node": "DOWNLOAD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DOWNLOAD": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model18": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "STYLE SYSTEM PROPMT AGENT1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "STYLE SYSTEM PROPMT AGENT1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait7": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "STYLE SYSTEM PROPMT AGENT1": {
+      "main": [
+        [
+          {
+            "node": "APPENDSTYLEPROMPT1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Analyze image2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook3": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook4": {
+      "main": [
+        [
+          {
+            "node": "Wait5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Art Director": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "UPLOADIMAGE": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model12": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "BANANA ENGINEER",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BANANA ENGINEER": {
+      "main": [
+        [
+          {
+            "node": "GETBINRAYIMAGE1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait5": {
+      "main": [
+        [
+          {
+            "node": "Split Out4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items4": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "BANANA ENGINEER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit an image": {
+      "main": [
+        []
+      ]
+    },
+    "GETBINRAYIMAGE1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook5": {
+      "main": [
+        [
+          {
+            "node": "Wait8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model13": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Art Director1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser5": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Art Director1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model19": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser5",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript6": {
+      "main": [
+        [
+          {
+            "node": "Art Director1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait9": {
+      "main": [
+        [
+          {
+            "node": "GET-ImageGen4-FAL3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ImageGen4-FAL": {
+      "main": [
+        [
+          {
+            "node": "Wait9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "GET-ImageGen4-FAL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET-ImageGen4-FAL3": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript7": {
+      "main": [
+        [
+          {
+            "node": "ImageGen4-FAL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET-ImageGen4-FAL": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript8": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait11": {
+      "main": [
+        [
+          {
+            "node": "STATUS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VEO1": {
+      "main": [
+        [
+          {
+            "node": "Wait11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "STATUS": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GETVIDEO": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model20": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Prompt Engineer Videos",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "VEO1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt Engineer Videos": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image3": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript9": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "GETVIDEO",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Prompt Engineer Videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait8": {
+      "main": [
+        [
+          {
+            "node": "Split Out5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out5": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "GETBINRAYIMAGE2": {
+      "main": [
+        [
+          {
+            "node": "Analyze image3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript9",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "UPLOADIMAGE1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook6": {
+      "main": [
+        [
+          {
+            "node": "Wait12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript10": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items5": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript10",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GETBINRAYIMAGE2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze document": {
+      "main": [
+        [
+          {
+            "node": "Brief ingest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model9": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "BRANDAGENT",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BRANDAGENT": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "BRANDAGENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GETSTYLEROW1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "APPENDSTYLEPROMPT1": {
+      "main": [
+        [
+          {
+            "node": "Create folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Art Director",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze document1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model17": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser6",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser6": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "BRANDAGENT",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger2": {
+      "main": [
+        []
+      ]
+    },
+    "Structured Output Parser7": {
+      "ai_outputParser": [
+        []
+      ]
+    },
+    "Code in JavaScript11": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "27de1c30-f901-4a89-8a0c-0f6a87044dce",
+  "meta": {
+    "instanceId": "47297a65646e8b08eb2f713a755051ac824847026613cf6276fb51fb701f04a8"
+  },
+  "id": "464pJYCMHfPnTBdD",
+  "tags": []
+}
